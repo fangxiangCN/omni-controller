@@ -1,0 +1,39 @@
+﻿# 02 架构与核心模块
+
+日期: 2026-02-02
+
+总体结构
+- apps/desktop: Electron 主应用 (main/renderer/preload)
+- packages/core: Midscene Agent 适配层
+- packages/drivers: Android / HarmonyOS / Web 驱动
+- packages/shared: IPC 事件与通用类型
+- resources/bin: adb/hdc/uitest_agent 等二进制资源
+
+核心模块
+1) Core (Midscene)
+- 入口: Agent.aiAct(), aiLocate(), aiTap()/aiInput()/aiScroll()
+- 依赖: TaskExecutor + Service
+- 特性: screenshot scale 处理, report dump, cache, replanning
+
+2) Drivers
+- 统一设备抽象: IDeviceAdapter (见 05-interfaces.md)
+- Android: adbkit + scrcpy server + @yume-chan/scrcpy 解码
+- HarmonyOS: hdckit UiDriver + startCaptureScreen(JPEG)
+- Web: PlaywrightAgent (Midscene web-integration)
+
+3) Renderer
+- Android: WebCodecs 解码 H.264
+- HarmonyOS: JPEG 直接 drawImage
+- Web: screenshot 或 DOM 展示
+- Timeline: 展示 Agent 执行日志
+
+统一 Agent Loop
+- 获取 UIContext
+- Agent.aiAct 规划
+- 调用 Adapter.actionSpace 执行
+- 写日志与帧, 更新 UI
+
+约束
+- AI 输出仅 Midscene 模式
+- Scrcpy 音频/控制/视频连接顺序需识别
+- HarmonyOS UiDriver 依赖固定版本 so

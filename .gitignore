@@ -1,0 +1,69 @@
+# =========================
+# Node / pnpm 工作区
+# =========================
+
+# 忽略 node_modules（包括 workspace 下所有子包）
+node_modules/
+**/node_modules/
+
+# pnpm 本地缓存（可选）
+.pnpm-store/
+store/
+
+# pnpm lock 不是忽略 —— 应该提交 pnpm-lock.yaml 保证一致性
+# pnpm-workspace.yaml 也应该提交
+
+# =========================
+# 日志
+# =========================
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# 构建 / 输出
+# =========================
+dist/
+build/
+out/
+lib/
+.eslintcache
+.cache/
+coverage/
+
+# =========================
+# 操作系统文件
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# 编辑器 / IDE 临时文件
+# =========================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# =========================
+# 环境变量 / 本地配置
+# =========================
+.env
+.env.local
+.env.*.local
+
+# =========================
+# TypeScript / 编译缓存
+# =========================
+*.tsbuildinfo
+
+# =========================
+# 其他
+# =========================
+*.swp
+*.swo
