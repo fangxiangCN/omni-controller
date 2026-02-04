@@ -138,7 +138,7 @@ export interface IDeviceAdapter /* extends AbstractInterface */ {
    - 支持 `shell`, `reverseTcp`, `forwardTcp`
 
 2. **Scrcpy Server 启动方式：**
-   - Push 到 `/data/local/tmp/aya/scrcpy.jar`
+   - Push 到 `/data/local/tmp/omni/scrcpy.jar`
    - 通过 `CLASSPATH=... app_process /system/bin com.genymobile.scrcpy.Server 3.1 ...`
 
 3. **Socket 连接顺序（真实实现）：**
@@ -156,9 +156,9 @@ export interface IDeviceAdapter /* extends AbstractInterface */ {
 
 **实现建议：**
 
-- 主进程：负责 `adbkit` 和 `startScrcpy()`
-- 渲染进程：负责 `ScrcpyClient`（解码+输入）
-- `startStream()` 输出 H.264 帧或直接输出 Canvas 渲染结果
+- 主进程：负责 `adbkit`、`startScrcpy()` 与 **control channel 输入**
+- 渲染进程：负责 H.264 解码与画面展示
+- `startStream()` 输出 H.264 帧；输入由主进程通过 control channel 注入
 
 ---
 
@@ -214,6 +214,7 @@ export interface IDeviceAdapter /* extends AbstractInterface */ {
 - **HarmonyOS**：JPEG 直接 `drawImage`（与 Echo 对齐）
 - **Web**：直接渲染 screenshot 或显示 DOM 结构
 - **Timeline**：使用 `<t-timeline>` 展示 Agent 执行步骤（可复用 Midscene 的 dump）
+- **输入控制**：由主进程通过 scrcpy control channel 执行（渲染进程只负责解码展示）
 
 ---
 
@@ -307,4 +308,3 @@ AI 输出由 Midscene 内部处理，外部无需关心具体 JSON。
 ### 阶段六：统一 Agent Loop
 
 > "主进程实现 `AgentScheduler`：接收指令 -> AI 规划 -> 调用 Adapter -> 发送日志/帧到 UI。"
-

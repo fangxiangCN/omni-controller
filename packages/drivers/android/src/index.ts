@@ -1,4 +1,4 @@
-﻿import type { DeviceFrame, DeviceInfo, DeviceList, DeviceSize } from '@omni/shared'
+﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared'
 import type { IDeviceAdapter } from '@omni/drivers-interface'
 import {
   defineActionTap,
@@ -20,6 +20,7 @@ export class AndroidAdapter implements IDeviceAdapter {
   private adb = new AdbClient()
   private scrcpy?: ScrcpyClient
   private deviceId = ''
+  private deviceSize?: DeviceSize
 
   async connect(deviceId?: string): Promise<boolean> {
     const result = await this.connectWithResult(deviceId)
@@ -34,11 +35,13 @@ export class AndroidAdapter implements IDeviceAdapter {
         if (!exists) return { ok: false, error: 'device_not_found' }
         this.deviceId = deviceId
         this.scrcpy = new ScrcpyClient(this.deviceId, this.adb)
+        this.deviceSize = await this.size()
         return { ok: true }
       }
       if (!devices.length) return { ok: false, error: 'no_devices' }
       this.deviceId = devices[0].id
       this.scrcpy = new ScrcpyClient(this.deviceId, this.adb)
+      this.deviceSize = await this.size()
       return { ok: true }
     } catch (e: any) {
       return { ok: false, error: e?.message || 'connect_error' }
@@ -46,7 +49,7 @@ export class AndroidAdapter implements IDeviceAdapter {
   }
 
   async disconnect(): Promise<void> {
-    await safeStop(this, this.scrcpy)
+    await safeStop(this.scrcpy)
   }
 
   async screenshotBase64(): Promise<string> {
@@ -74,7 +77,7 @@ export class AndroidAdapter implements IDeviceAdapter {
       }),
       defineActionKeyboardPress(async (param) => {
         if (param.keyName.toLowerCase() === 'backspace') {
-          await this.adb.shell(this.deviceId, 'input keyevent 67')
+          await this.scrcpy?.backspace()
         }
       }),
       defineActionScroll(async (param) => {
@@ -121,22 +124,31 @@ export class AndroidAdapter implements IDeviceAdapter {
   }
 
   async tap(x: number, y: number): Promise<void> {
-    await this.adb.shell(this.deviceId, `input tap ${x} ${y}`)
+    const size = await this.ensureSize()
+    await this.scrcpy?.tap(x, y, size)
   }
 
   async type(text: string): Promise<void> {
-    await this.adb.shell(this.deviceId, `input text ${JSON.stringify(text)}`)
+    await this.scrcpy?.type(text)
   }
 
   async scroll(dx: number, dy: number): Promise<void> {
-    await this.adb.shell(this.deviceId, `input swipe 0 0 ${dx} ${dy}`)
+    const size = await this.ensureSize()
+    await this.scrcpy?.scroll(dx, dy, size)
   }
 
   async back(): Promise<void> {
-    await this.adb.shell(this.deviceId, 'input keyevent 4')
+    await this.scrcpy?.back()
   }
 
   async getDeviceInfo(): Promise<DeviceInfo> {
     return { id: this.deviceId || 'android-unknown', name: 'Android', type: 'android' }
+  }
+
+  private async ensureSize(): Promise<DeviceSize> {
+    if (!this.deviceSize || this.deviceSize.width === 0 || this.deviceSize.height === 0) {
+      this.deviceSize = await this.size()
+    }
+    return this.deviceSize
   }
 }

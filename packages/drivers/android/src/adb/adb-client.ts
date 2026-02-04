@@ -1,5 +1,6 @@
 ﻿import Adb from '@devicefarmer/adbkit'
 import getPort from 'get-port'
+import type { Duplex } from 'node:stream'
 
 export type AdbDeviceInfo = {
   id: string
@@ -27,6 +28,11 @@ export class AdbClient {
     const socket = await device.shell(cmd)
     const output = await Adb.util.readAll(socket)
     return Buffer.from(output)
+  }
+
+  async shellSocket(deviceId: string, cmd: string): Promise<Duplex> {
+    const device = this.client.getDevice(deviceId)
+    return device.shell(cmd)
   }
 
   async reverseTcp(deviceId: string, remote: string): Promise<number> {

@@ -7,3 +7,14 @@ export type DeviceInfo = {
 }
 
 export type DeviceList = DeviceInfo[]
+
+export type DeviceSize = {
+  width: number
+  height: number
+  dpr?: number
+}
+
+export type DeviceFrame = {
+  data: Uint8Array
+  format: 'h264' | 'jpeg'
+}

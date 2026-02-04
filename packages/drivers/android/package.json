@@ -8,6 +8,8 @@
     "@omni/drivers-interface": "workspace:*",
     "@omni/shared": "workspace:*",
     "@yume-chan/no-data-view": "^2.0.0",
+    "@yume-chan/scrcpy": "^2.3.0",
+    "@yume-chan/stream-extra": "^2.1.0",
     "get-port": "^7.1.0"
   }
 }
