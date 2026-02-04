@@ -48,8 +48,20 @@ export class AndroidAdapter implements IDeviceAdapter {
     }
   }
 
+  async listDevices(): Promise<DeviceInfo[]> {
+    const devices = await this.adb.listDevices()
+    return devices.map((d) => ({
+      id: d.id,
+      name: d.id,
+      type: 'android',
+    }))
+  }
+
   async disconnect(): Promise<void> {
     await safeStop(this.scrcpy)
+    this.scrcpy = undefined
+    this.deviceId = ''
+    this.deviceSize = undefined
   }
 
   async screenshotBase64(): Promise<string> {

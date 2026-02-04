@@ -14,10 +14,11 @@
 - 阶段 3: DONE (Android 驱动: adbkit + scrcpy reverseTcp + H.264 IPC + control channel)
 - 阶段 4: TODO
 - 阶段 5: TODO
-- 阶段 6: DOING (IPC/日志/状态/画布占位已打通)
+- 阶段 6: DOING (统一 Agent Loop 与 UI 重构中)
 - 阶段 7: TODO
 
 里程碑记录
 - 2026-02-02: 创建项目目录与 docs
 - 2026-02-04: Midscene Agent 适配接入与 IPC 桥接
 - 2026-02-04: Android 驱动收尾（scrcpy control + socket 顺序对齐 Aya）
+- 2026-02-04: 统一 Agent Loop 直连重构（DeviceManager + TaskScheduler）
