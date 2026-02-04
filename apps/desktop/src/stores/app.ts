@@ -1,7 +1,7 @@
 ﻿import { defineStore } from 'pinia'
-import { IPC_DEVICE_LIST, IPC_TASK_LOG, IPC_TASK_STATE } from '@omni/shared'
+import { IPC_DEVICE_LIST, IPC_TASK_LOG, IPC_TASK_STATE, IPC_DEVICE_SELECT } from '@omni/shared'
 import type { DeviceInfo, TaskLog, TaskState } from '@omni/shared'
-import { ipcOn } from '../ipc'
+import { ipcOn, ipcSend } from '../ipc'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
@@ -30,6 +30,7 @@ export const useAppStore = defineStore('app', {
     },
     setActiveDevice(id: string) {
       this.activeDeviceId = id
+      ipcSend(IPC_DEVICE_SELECT, { deviceId: id })
     },
     pushLog(log: TaskLog) {
       this.logs.push(log)

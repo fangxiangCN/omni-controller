@@ -1,7 +1,16 @@
 ﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared'
 import type { IDeviceAdapter } from '@omni/drivers-interface'
+import {
+  defineActionTap,
+  defineActionInput,
+  defineActionScroll,
+  defineActionKeyboardPress,
+} from '@midscene/core/device'
+import type { DeviceAction } from '@midscene/core'
 import { AdbClient } from './adb/adb-client'
 import { ScrcpyClient } from './scrcpy/scrcpy-client'
+import { safeStop } from './lifecycle'
+import type { ConnectResult } from './types'
 
 // Reference: references/aya
 export class AndroidAdapter implements IDeviceAdapter {
@@ -11,20 +20,27 @@ export class AndroidAdapter implements IDeviceAdapter {
   private deviceId = ''
 
   async connect(deviceId?: string): Promise<boolean> {
+    const result = await this.connectWithResult(deviceId)
+    return result.ok
+  }
+
+  async connectWithResult(deviceId?: string): Promise<ConnectResult> {
+    const devices = await this.adb.listDevices()
     if (deviceId) {
+      const exists = devices.find((d) => d.id === deviceId)
+      if (!exists) return { ok: false, error: 'device_not_found' }
       this.deviceId = deviceId
       this.scrcpy = new ScrcpyClient(this.deviceId, this.adb)
-      return true
+      return { ok: true }
     }
-    const devices = await this.adb.listDevices()
-    if (!devices.length) return false
+    if (!devices.length) return { ok: false, error: 'no_devices' }
     this.deviceId = devices[0].id
     this.scrcpy = new ScrcpyClient(this.deviceId, this.adb)
-    return true
+    return { ok: true }
   }
 
   async disconnect(): Promise<void> {
-    await this.scrcpy?.stop()
+    await safeStop(this, this.scrcpy)
   }
 
   async screenshotBase64(): Promise<string> {
@@ -41,8 +57,34 @@ export class AndroidAdapter implements IDeviceAdapter {
     return { width: 0, height: 0 }
   }
 
-  actionSpace(): unknown[] {
-    return []
+  actionSpace(): DeviceAction[] {
+    return [
+      defineActionTap(async (param) => {
+        const { center } = param.locate
+        await this.tap(center[0], center[1])
+      }),
+      defineActionInput(async (param) => {
+        await this.type(param.value)
+      }),
+      defineActionKeyboardPress(async (param) => {
+        if (param.keyName.toLowerCase() === 'backspace') {
+          await this.adb.shell(this.deviceId, 'input keyevent 67')
+        }
+      }),
+      defineActionScroll(async (param) => {
+        const dir = param.direction || 'down'
+        const distance = param.distance || 300
+        if (dir === 'down') {
+          await this.scroll(0, distance)
+        } else if (dir === 'up') {
+          await this.scroll(0, -distance)
+        } else if (dir === 'left') {
+          await this.scroll(-distance, 0)
+        } else if (dir === 'right') {
+          await this.scroll(distance, 0)
+        }
+      }),
+    ]
   }
 
   async startStream(onFrame: (frame: DeviceFrame) => void): Promise<void> {

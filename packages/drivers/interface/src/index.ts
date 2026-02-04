@@ -1,17 +1,18 @@
 ﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared'
+import type { DeviceAction } from '@midscene/core'
 
 export interface IDeviceAdapter {
   interfaceType: string
 
   screenshotBase64(): Promise<string>
   size(): Promise<DeviceSize>
-  actionSpace(): unknown[]
+  actionSpace(): DeviceAction[]
 
   getContext?(): Promise<unknown>
   destroy?(): Promise<void>
   getDeviceInfo?(): Promise<DeviceInfo>
 
-  connect(): Promise<boolean>
+  connect(deviceId?: string): Promise<boolean>
   disconnect(): Promise<void>
 
   startStream(onFrame: (frame: DeviceFrame) => void): Promise<void>

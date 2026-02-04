@@ -44,3 +44,4 @@ export const IPC_TASK_LOG = IpcChannels.TASK_LOG;
 export const IPC_START_TASK = IpcChannels.START_TASK;
 export const IPC_DEVICE_FRAME = IpcChannels.DEVICE_FRAME;
 export const IPC_TASK_STATE = 'task:state';
+export const IPC_DEVICE_SELECT = 'device:select';

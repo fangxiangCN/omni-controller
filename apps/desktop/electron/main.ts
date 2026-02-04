@@ -5,11 +5,13 @@ import path from 'node:path'
 import {
   IPC_DEVICE_FRAME,
   IPC_DEVICE_LIST,
+  IPC_DEVICE_SELECT,
   IPC_START_TASK,
   IPC_TASK_LOG,
   IPC_TASK_STATE,
 } from '@omni/shared'
 import { AndroidAdapter } from '@omni/drivers-android'
+import { createAgentFromEnv } from '@omni/core'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -25,6 +27,8 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win: BrowserWindow | null
 
 const android = new AndroidAdapter()
+let agent = createAgentFromEnv(android)
+let connectedAndroidId = ''
 
 function createWindow() {
   win = new BrowserWindow({
@@ -38,13 +42,12 @@ function createWindow() {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
     win?.webContents.send(IPC_DEVICE_LIST, {
       devices: [
-        { id: 'device-1', name: 'Android-001', type: 'android' },
-        { id: 'device-2', name: 'HarmonyOS-001', type: 'ohos' },
-        { id: 'web-1', name: 'Web-Playwright', type: 'web' },
+        { id: 'android', name: 'Android', type: 'android' },
+        { id: 'ohos', name: 'HarmonyOS', type: 'ohos' },
+        { id: 'web', name: 'Web-Playwright', type: 'web' },
       ],
     })
 
-    // auto-connect android (no-op if no device)
     try {
       const ok = await android.connect()
       if (!ok) {
@@ -55,6 +58,14 @@ function createWindow() {
         return
       }
       const info = await android.getDeviceInfo()
+      connectedAndroidId = info.id
+      win?.webContents.send(IPC_DEVICE_LIST, {
+        devices: [
+          { id: info.id, name: 'Android', type: 'android' },
+          { id: 'ohos', name: 'HarmonyOS', type: 'ohos' },
+          { id: 'web', name: 'Web-Playwright', type: 'web' },
+        ],
+      })
       android.startStream((frame) => {
         win?.webContents.send(IPC_DEVICE_FRAME, {
           deviceId: info.id,
@@ -62,6 +73,7 @@ function createWindow() {
           data: frame.data,
         })
       })
+      agent = createAgentFromEnv(android)
     } catch {
       // ignore
     }
@@ -75,10 +87,58 @@ function createWindow() {
 }
 
 function registerIpc() {
-  ipcMain.on(IPC_START_TASK, (_event, payload) => {
+  ipcMain.on(IPC_DEVICE_SELECT, async (_event, payload) => {
+    const deviceId = payload?.deviceId || ''
+    if (!deviceId || deviceId === connectedAndroidId) return
+    const ok = await android.connect(deviceId)
+    if (!ok) {
+      win?.webContents.send(IPC_TASK_LOG, {
+        type: 'error',
+        content: `Android 连接失败: ${deviceId}`,
+      })
+      return
+    }
+    connectedAndroidId = deviceId
+    agent = createAgentFromEnv(android)
+    win?.webContents.send(IPC_DEVICE_LIST, {
+      devices: [
+        { id: connectedAndroidId, name: 'Android', type: 'android' },
+        { id: 'ohos', name: 'HarmonyOS', type: 'ohos' },
+        { id: 'web', name: 'Web-Playwright', type: 'web' },
+      ],
+    })
+  })
+  ipcMain.on(IPC_START_TASK, async (_event, payload) => {
     const instruction = payload?.instruction || ''
     const deviceId = payload?.deviceId || ''
     const startedAt = Date.now()
+    if (!process.env.MIDSCENE_MODEL_NAME || !process.env.MIDSCENE_OPENAI_API_KEY) {
+      win?.webContents.send(IPC_TASK_LOG, {
+        type: 'error',
+        content: '模型配置缺失: 请检查 .env 中 MIDSCENE_MODEL_NAME / MIDSCENE_OPENAI_API_KEY',
+      })
+      return
+    }
+    if (deviceId && deviceId !== connectedAndroidId) {
+      try {
+        const ok = await android.connect(deviceId)
+        if (!ok) {
+          win?.webContents.send(IPC_TASK_LOG, {
+            type: 'error',
+            content: `Android 连接失败: ${deviceId}`,
+          })
+          return
+        }
+        connectedAndroidId = deviceId
+        agent = createAgentFromEnv(android)
+      } catch {
+        win?.webContents.send(IPC_TASK_LOG, {
+          type: 'error',
+          content: `Android 连接失败: ${deviceId}`,
+        })
+        return
+      }
+    }
     win?.webContents.send(IPC_TASK_STATE, {
       status: 'running',
       startedAt,
@@ -87,29 +147,29 @@ function registerIpc() {
       type: 'thought',
       content: `收到任务: ${instruction} (device=${deviceId})`,
     })
-    setTimeout(() => {
-      win?.webContents.send(IPC_TASK_LOG, {
-        type: 'plan',
-        content: '解析任务并规划步骤',
-      })
-    }, 400)
-    setTimeout(() => {
-      win?.webContents.send(IPC_TASK_LOG, {
-        type: 'action',
-        content: '模拟执行: Tap(x,y)',
-      })
-    }, 800)
-    setTimeout(() => {
+
+    try {
+      await agent.aiAct(instruction)
       win?.webContents.send(IPC_TASK_LOG, {
         type: 'info',
-        content: '任务完成 (模拟)',
+        content: '任务完成 (Midscene)',
       })
       win?.webContents.send(IPC_TASK_STATE, {
         status: 'success',
         startedAt,
         finishedAt: Date.now(),
       })
-    }, 1200)
+    } catch (e: any) {
+      win?.webContents.send(IPC_TASK_LOG, {
+        type: 'error',
+        content: `任务失败: ${e?.message || e}`,
+      })
+      win?.webContents.send(IPC_TASK_STATE, {
+        status: 'error',
+        startedAt,
+        finishedAt: Date.now(),
+      })
+    }
   })
 }
 

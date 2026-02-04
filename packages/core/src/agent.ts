@@ -10,6 +10,17 @@ export function createAgent(adapter: IDeviceAdapter, opts?: CreateAgentOptions):
   return new MidsceneAgent(iface, opts) as unknown as MidsceneAgentLike
 }
 
+export function createAgentFromEnv(adapter: IDeviceAdapter): MidsceneAgentLike {
+  const opts: AgentOpt = {
+    modelConfig: {
+      MIDSCENE_MODEL_NAME: process.env.MIDSCENE_MODEL_NAME,
+      MIDSCENE_OPENAI_BASE_URL: process.env.MIDSCENE_OPENAI_BASE_URL,
+      MIDSCENE_OPENAI_API_KEY: process.env.MIDSCENE_OPENAI_API_KEY,
+    },
+  }
+  return createAgent(adapter, opts)
+}
+
 import { NoopScheduler } from './scheduler'
 
 export function createSchedulerFactory() {

@@ -62,6 +62,10 @@ function startTask() {
           <span class="status-chip" :data-status="store.taskState.status">
             {{ store.taskState.status }}
           </span>
+          <span class="status-label">Device</span>
+          <span class="status-chip" data-status="info">
+            {{ store.activeDeviceId || 'none' }}
+          </span>
         </div>
         <ScreenCanvas :device-id="store.activeDeviceId" />
       </t-content>
@@ -148,6 +152,10 @@ function startTask() {
 .status-chip[data-status='error'] {
   color: #ff4d4f;
   border-color: #ff4d4f;
+}
+.status-chip[data-status='info'] {
+  color: #8b94a7;
+  border-color: #2a3240;
 }
 .screen-canvas {
   height: calc(100vh - 120px);
