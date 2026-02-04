@@ -9,7 +9,7 @@
 - BLOCKED: 阻塞
 
 当前进度
-- 阶段 1: TODO
+- 阶段 1: DONE (脚手架与依赖接入完成)
 - 阶段 2: TODO
 - 阶段 3: TODO
 - 阶段 4: TODO

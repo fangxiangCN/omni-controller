@@ -1,0 +1,6 @@
+﻿{
+  "name": "@omni/drivers-android",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module"
+}
