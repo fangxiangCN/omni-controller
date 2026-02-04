@@ -5,6 +5,8 @@ import {
   defineActionInput,
   defineActionScroll,
   defineActionKeyboardPress,
+  defineActionLongPress,
+  defineActionSwipe,
 } from '@midscene/core/device'
 import type { DeviceAction } from '@midscene/core'
 import { AdbClient } from './adb/adb-client'
@@ -84,6 +86,14 @@ export class AndroidAdapter implements IDeviceAdapter {
           await this.scroll(distance, 0)
         }
       }),
+      defineActionLongPress(async (param) => {
+        const { center } = param.locate
+        await this.adb.shell(this.deviceId, `input swipe ${center[0]} ${center[1]} ${center[0]} ${center[1]} 500`)
+      }),
+      defineActionSwipe(async (param) => {
+        const start = param.start?.center || [0, 0]
+        const end = param.end?.center || [0, 0]
+        await this.adb.shell(this.deviceId, `input swipe ${start[0]} ${start[1]} ${end[0]} ${end[1]}`)\n      }),
     ]
   }
 
