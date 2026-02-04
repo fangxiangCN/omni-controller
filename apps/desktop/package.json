@@ -9,7 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@omni/drivers-android": "workspace:*",
     "@omni/shared": "workspace:*",
+    "@yume-chan/scrcpy": "^2.3.0",
+    "@yume-chan/scrcpy-decoder-webcodecs": "^2.5.0",
+    "@yume-chan/stream-extra": "^2.1.0",
     "pinia": "^3.0.4",
     "tdesign-vue-next": "^1.18.0",
     "vue": "^3.4.21"

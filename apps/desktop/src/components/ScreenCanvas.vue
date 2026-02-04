@@ -1,6 +1,9 @@
 ﻿<script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 import { IPC_DEVICE_FRAME } from '@omni/shared'
+import { AndroidStreamDecoder } from './android-stream-decoder'
+import { ScrcpyOptions3_1 } from '@yume-chan/scrcpy'
+import { PushReadableStream } from '@yume-chan/stream-extra'
 
 type Frame = {
   data: Uint8Array
@@ -9,6 +12,9 @@ type Frame = {
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const props = defineProps<{ deviceId?: string }>()
+const decoder = new AndroidStreamDecoder()
+let h264Controller: ReadableStreamDefaultController<Uint8Array> | null = null
+let decoderStarted = false
 let ctx: CanvasRenderingContext2D | null = null
 
 function drawJpeg(frame: Frame) {
@@ -32,6 +38,23 @@ function handleFrame(_event: unknown, payload: Frame & { deviceId?: string }) {
     return
   }
   if (payload.format === 'h264') {
+    if (!decoderStarted) {
+      decoderStarted = true
+      const stream = new PushReadableStream<Uint8Array>(async (controller) => {
+        h264Controller = controller
+      })
+      const options = new ScrcpyOptions3_1({
+        audio: false,
+        videoBitRate: 8000000,
+        maxSize: 0,
+        clipboardAutosync: false,
+        stayAwake: false,
+      })
+      decoder.attach(stream, options).catch(() => {
+        decoderStarted = false
+      })
+    }
+    h264Controller?.enqueue(payload.data)
     return
   }
   if (payload.format === 'jpeg') {

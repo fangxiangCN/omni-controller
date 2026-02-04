@@ -1,6 +1,13 @@
-﻿{
+{
   "name": "@omni/drivers-android",
   "private": true,
   "version": "0.0.0",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@devicefarmer/adbkit": "^3.3.8",
+    "@omni/drivers-interface": "workspace:*",
+    "@omni/shared": "workspace:*",
+    "@yume-chan/no-data-view": "^2.0.0",
+    "get-port": "^7.1.0"
+  }
 }
