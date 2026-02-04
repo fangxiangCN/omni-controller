@@ -33,6 +33,11 @@
 - 调用 Adapter.actionSpace 执行
 - 写日志与帧, 更新 UI
 
+当前实现补充
+- main: 已接入 IPC（task:start / task:log / task:state / device:list / device:frame / device:select）
+- Android: adbkit + scrcpy reverseTcp 已打通，H.264 通过 IPC 流入 renderer
+- renderer: ScreenCanvas 支持 JPEG/H.264 占位解码路径
+
 约束
 - AI 输出仅 Midscene 模式
 - Scrcpy 音频/控制/视频连接顺序需识别

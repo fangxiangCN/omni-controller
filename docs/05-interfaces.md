@@ -2,7 +2,7 @@
 
 日期: 2026-02-02
 
-IDeviceAdapter
+IDeviceAdapter（与当前实现一致）
 ```ts
 export interface IDeviceAdapter {
   interfaceType: string;
@@ -15,9 +15,10 @@ export interface IDeviceAdapter {
   // 可选优化
   getContext?(): Promise<UIContext>;
   destroy?(): Promise<void>;
+  getDeviceInfo?(): Promise<DeviceInfo>;
 
   // 生命周期
-  connect(): Promise<boolean>;
+  connect(deviceId?: string): Promise<boolean>;
   disconnect(): Promise<void>;
 
   // 流与输入
@@ -37,6 +38,8 @@ export enum IpcChannels {
   DEVICE_UPDATE = 'device:list',
   TASK_LOG = 'task:log',
   DEVICE_FRAME = 'device:frame', // { deviceId, format, data }
+  DEVICE_SELECT = 'device:select',
+  TASK_STATE = 'task:state',
 }
 ```
 

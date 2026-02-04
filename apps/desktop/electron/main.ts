@@ -121,11 +121,11 @@ function registerIpc() {
     }
     if (deviceId && deviceId !== connectedAndroidId) {
       try {
-        const ok = await android.connect(deviceId)
-        if (!ok) {
+        const result = await android.connectWithResult?.(deviceId)
+        if (!result?.ok) {
           win?.webContents.send(IPC_TASK_LOG, {
             type: 'error',
-            content: `Android 连接失败: ${deviceId}`,
+            content: `Android 连接失败: ${deviceId} (${result?.error || 'unknown'})`,
           })
           return
         }

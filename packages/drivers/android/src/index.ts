@@ -1,4 +1,4 @@
-﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared'
+﻿import type { DeviceFrame, DeviceInfo, DeviceList, DeviceSize } from '@omni/shared'
 import type { IDeviceAdapter } from '@omni/drivers-interface'
 import {
   defineActionTap,
@@ -27,18 +27,22 @@ export class AndroidAdapter implements IDeviceAdapter {
   }
 
   async connectWithResult(deviceId?: string): Promise<ConnectResult> {
-    const devices = await this.adb.listDevices()
-    if (deviceId) {
-      const exists = devices.find((d) => d.id === deviceId)
-      if (!exists) return { ok: false, error: 'device_not_found' }
-      this.deviceId = deviceId
+    try {
+      const devices = await this.adb.listDevices()
+      if (deviceId) {
+        const exists = devices.find((d) => d.id === deviceId)
+        if (!exists) return { ok: false, error: 'device_not_found' }
+        this.deviceId = deviceId
+        this.scrcpy = new ScrcpyClient(this.deviceId, this.adb)
+        return { ok: true }
+      }
+      if (!devices.length) return { ok: false, error: 'no_devices' }
+      this.deviceId = devices[0].id
       this.scrcpy = new ScrcpyClient(this.deviceId, this.adb)
       return { ok: true }
+    } catch (e: any) {
+      return { ok: false, error: e?.message || 'connect_error' }
     }
-    if (!devices.length) return { ok: false, error: 'no_devices' }
-    this.deviceId = devices[0].id
-    this.scrcpy = new ScrcpyClient(this.deviceId, this.adb)
-    return { ok: true }
   }
 
   async disconnect(): Promise<void> {
@@ -91,9 +95,24 @@ export class AndroidAdapter implements IDeviceAdapter {
         await this.adb.shell(this.deviceId, `input swipe ${center[0]} ${center[1]} ${center[0]} ${center[1]} 500`)
       }),
       defineActionSwipe(async (param) => {
-        const start = param.start?.center || [0, 0]
-        const end = param.end?.center || [0, 0]
-        await this.adb.shell(this.deviceId, `input swipe ${start[0]} ${start[1]} ${end[0]} ${end[1]}`)\n      }),
+        const start = param.start?.center
+        const end = param.end?.center
+        if (start && end) {
+          await this.adb.shell(this.deviceId, `input swipe ${start[0]} ${start[1]} ${end[0]} ${end[1]}`)
+          return
+        }
+        const dir = param.direction || 'down'
+        const distance = param.distance || 300
+        if (dir === 'down') {
+          await this.scroll(0, distance)
+        } else if (dir === 'up') {
+          await this.scroll(0, -distance)
+        } else if (dir === 'left') {
+          await this.scroll(-distance, 0)
+        } else if (dir === 'right') {
+          await this.scroll(distance, 0)
+        }
+      }),
     ]
   }
 

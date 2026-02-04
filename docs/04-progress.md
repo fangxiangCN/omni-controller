@@ -10,12 +10,13 @@
 
 当前进度
 - 阶段 1: DONE (脚手架与依赖接入完成)
-- 阶段 2: DOING (Core 骨架已建立)
-- 阶段 3: TODO
+- 阶段 2: DONE (Midscene Agent 适配已接入)
+- 阶段 3: DOING (Android 驱动: adbkit + scrcpy reverseTcp + H.264 IPC)
 - 阶段 4: TODO
 - 阶段 5: TODO
-- 阶段 6: TODO
+- 阶段 6: DOING (IPC/日志/状态/画布占位已打通)
 - 阶段 7: TODO
 
 里程碑记录
 - 2026-02-02: 创建项目目录与 docs
+- 2026-02-04: Midscene Agent 适配接入与 IPC 桥接
