@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAppStore } from './stores/app'
+import ScreenCanvas from './components/ScreenCanvas.vue'
+import { IPC_START_TASK } from '@omni/shared'
+import { ipcSend } from './ipc'
 
 const prompt = ref('')
 const store = useAppStore()
@@ -13,6 +16,10 @@ if (store.devices.length === 0) {
   ])
 }
 
+onMounted(() => {
+  store.initIpc()
+})
+
 const menuValue = computed(() => store.activeDeviceId || 'device-1')
 const timeline = computed(() =>
   store.logs.length
@@ -23,6 +30,14 @@ const timeline = computed(() =>
         { type: 'action', content: '—' },
       ],
 )
+
+function startTask() {
+  if (!prompt.value.trim()) return
+  ipcSend(IPC_START_TASK, {
+    instruction: prompt.value.trim(),
+    deviceId: store.activeDeviceId,
+  })
+}
 </script>
 
 <template>
@@ -42,14 +57,25 @@ const timeline = computed(() =>
 
     <t-layout>
       <t-content class="content">
-        <div class="screen-canvas">ScreenCanvas</div>
+        <div class="status-bar">
+          <span class="status-label">Task</span>
+          <span class="status-chip" :data-status="store.taskState.status">
+            {{ store.taskState.status }}
+          </span>
+        </div>
+        <ScreenCanvas :device-id="store.activeDeviceId" />
       </t-content>
       <t-footer class="input">
-        <t-textarea
-          v-model="prompt"
-          placeholder="用自然语言描述任务..."
-          :autosize="{ minRows: 2, maxRows: 4 }"
-        />
+        <div class="input-row">
+          <t-textarea
+            v-model="prompt"
+            placeholder="用自然语言描述任务..."
+            :autosize="{ minRows: 2, maxRows: 4 }"
+          />
+          <t-button class="run-btn" theme="primary" @click="startTask">
+            开始任务
+          </t-button>
+        </div>
       </t-footer>
     </t-layout>
 
@@ -94,6 +120,35 @@ const timeline = computed(() =>
 .content {
   padding: 12px;
 }
+.status-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.status-label {
+  color: #8b94a7;
+}
+.status-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #1a2230;
+  color: #c9d2e3;
+  border: 1px solid #2a3240;
+}
+.status-chip[data-status='running'] {
+  color: #00d2a3;
+  border-color: #00d2a3;
+}
+.status-chip[data-status='success'] {
+  color: #52c41a;
+  border-color: #52c41a;
+}
+.status-chip[data-status='error'] {
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
 .screen-canvas {
   height: calc(100vh - 120px);
   border: 1px dashed #2a3240;
@@ -108,5 +163,14 @@ const timeline = computed(() =>
   padding: 12px;
   border-top: 1px solid #232a35;
   background: #111720;
+}
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 12px;
+  align-items: end;
+}
+.run-btn {
+  height: 40px;
 }
 </style>

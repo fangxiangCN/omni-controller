@@ -1,4 +1,11 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
+import {
+  IPC_DEVICE_FRAME,
+  IPC_DEVICE_LIST,
+  IPC_START_TASK,
+  IPC_TASK_LOG,
+  IPC_TASK_STATE,
+} from '@omni/shared'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -37,6 +44,22 @@ function createWindow() {
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
+    win?.webContents.send(IPC_DEVICE_LIST, {
+      devices: [
+        { id: 'device-1', name: 'Android-001', type: 'android' },
+        { id: 'device-2', name: 'HarmonyOS-001', type: 'ohos' },
+        { id: 'web-1', name: 'Web-Playwright', type: 'web' },
+      ],
+    })
+    // 1x1 jpeg placeholder frame
+    const jpegBase64 =
+      '/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQEBIQEBAQEA8QDw8PDw8PDw8PDw8PFREWFhURFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGhAQGy0lICUuLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAAEAAQMBIgACEQEDEQH/xAAXAAEBAQEAAAAAAAAAAAAAAAAAAQID/8QAFhEBAQEAAAAAAAAAAAAAAAAAAAER/8QAFgEBAQEAAAAAAAAAAAAAAAAAAQIE/8QAFhEBAQEAAAAAAAAAAAAAAAAAAAER/9oADAMBAAIRAxEAPwD7AooA/9k='
+    const frame = Buffer.from(jpegBase64, 'base64')
+    win?.webContents.send(IPC_DEVICE_FRAME, {
+      deviceId: 'device-1',
+      format: 'jpeg',
+      data: frame,
+    })
   })
 
   if (VITE_DEV_SERVER_URL) {
@@ -45,6 +68,45 @@ function createWindow() {
     // win.loadFile('dist/index.html')
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
+}
+
+function registerIpc() {
+  ipcMain.on(IPC_START_TASK, (_event, payload) => {
+    const instruction = payload?.instruction || ''
+    const deviceId = payload?.deviceId || ''
+    const startedAt = Date.now()
+    win?.webContents.send(IPC_TASK_STATE, {
+      status: 'running',
+      startedAt,
+    })
+    win?.webContents.send(IPC_TASK_LOG, {
+      type: 'thought',
+      content: `收到任务: ${instruction} (device=${deviceId})`,
+    })
+    setTimeout(() => {
+      win?.webContents.send(IPC_TASK_LOG, {
+        type: 'plan',
+        content: '解析任务并规划步骤',
+      })
+    }, 400)
+    setTimeout(() => {
+      win?.webContents.send(IPC_TASK_LOG, {
+        type: 'action',
+        content: '模拟执行: Tap(x,y)',
+      })
+    }, 800)
+    setTimeout(() => {
+      win?.webContents.send(IPC_TASK_LOG, {
+        type: 'info',
+        content: '任务完成 (模拟)',
+      })
+      win?.webContents.send(IPC_TASK_STATE, {
+        status: 'success',
+        startedAt,
+        finishedAt: Date.now(),
+      })
+    }, 1200)
+  })
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -65,4 +127,7 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  registerIpc()
+  createWindow()
+})

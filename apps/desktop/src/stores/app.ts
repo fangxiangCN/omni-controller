@@ -1,17 +1,28 @@
 ﻿import { defineStore } from 'pinia'
-
-type DeviceItem = { id: string; name: string; type: 'android' | 'ohos' | 'web' }
-
-type TaskLog = { type: 'thought' | 'plan' | 'action' | 'error' | 'info'; content: string }
+import { IPC_DEVICE_LIST, IPC_TASK_LOG, IPC_TASK_STATE } from '@omni/shared'
+import type { DeviceInfo, TaskLog, TaskState } from '@omni/shared'
+import { ipcOn } from '../ipc'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
-    devices: [] as DeviceItem[],
+    devices: [] as DeviceInfo[],
     activeDeviceId: '' as string,
     logs: [] as TaskLog[],
+    taskState: { status: 'idle' } as TaskState,
   }),
   actions: {
-    setDevices(list: DeviceItem[]) {
+    initIpc() {
+      ipcOn(IPC_DEVICE_LIST, (payload: { devices: DeviceInfo[] }) => {
+        if (payload?.devices) this.setDevices(payload.devices)
+      })
+      ipcOn(IPC_TASK_LOG, (payload: TaskLog) => {
+        if (payload?.content) this.pushLog(payload)
+      })
+      ipcOn(IPC_TASK_STATE, (payload: TaskState) => {
+        if (payload?.status) this.taskState = payload
+      })
+    },
+    setDevices(list: DeviceInfo[]) {
       this.devices = list
       if (!this.activeDeviceId && list.length > 0) {
         this.activeDeviceId = list[0].id

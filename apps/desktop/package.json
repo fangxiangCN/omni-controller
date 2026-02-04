@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@omni/shared": "workspace:*",
     "pinia": "^3.0.4",
     "tdesign-vue-next": "^1.18.0",
     "vue": "^3.4.21"
