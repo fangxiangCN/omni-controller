@@ -1,4 +1,4 @@
-import type { TUserPrompt } from '../ai-model/index';
+ï»¿import type { TUserPrompt } from '../ai-model/index';
 import { ScreenshotItem } from '../screenshot-item';
 import Service from '../service/index';
 // Import types and values directly from their source files to avoid circular dependency
@@ -42,13 +42,10 @@ export type TestStatus =
 import { isAutoGLM, isUITars } from '@/ai-model/auto-glm/util';
 import yaml from 'js-yaml';
 
-import {
-  getVersion,
-  groupedActionDumpFileExt,
-  processCacheConfig,
-  reportHTMLContent,
-  writeLogFile,
-} from '@/utils';
+import { getVersion, processCacheConfig, reportHTMLContent } from '@/utils';
+import { commonContextParser, getReportFileName, parsePrompt } from './utils';
+import type { IReportGenerator } from '@/report-generator';
+import { ReportGenerator } from '@/report-generator';
 import {
   ScriptPlayer,
   buildDetailedLocateParam,
@@ -68,7 +65,7 @@ import {
 } from '@omni/shared/env';
 import { imageInfoOfBase64, resizeImgBase64 } from '@omni/shared/img';
 import { getDebug } from '@omni/shared/logger';
-import { assert } from '@omni/shared/utils';
+import { assert, ifInBrowser, uuid } from '@omni/shared/utils';
 import { defineActionSleep } from '../device';
 import { TaskCache } from './task-cache';
 import {
@@ -78,12 +75,6 @@ import {
   withFileChooser,
 } from './tasks';
 import { locateParamStr, paramStr, taskTitleStr, typeStr } from './ui-utils';
-import {
-  commonContextParser,
-  getReportFileName,
-  parsePrompt,
-  printReportMsg,
-} from './utils';
 
 const debug = getDebug('agent');
 
@@ -165,6 +156,8 @@ export class Agent<
   reportFile?: string | null;
 
   reportFileName?: string;
+
+  private reportGenerator: IReportGenerator;
 
   taskExecutor: TaskExecutor;
 
@@ -414,6 +407,12 @@ export class Agent<
     this.reportFileName =
       opts?.reportFileName ||
       getReportFileName(opts?.testId || this.interface.interfaceType || 'web');
+
+    this.reportGenerator = ReportGenerator.create(this.reportFileName!, {
+      generateReport: this.opts.generateReport,
+      outputFormat: this.opts.outputFormat,
+      autoPrintReportMsg: this.opts.autoPrintReportMsg,
+    });
   }
 
   async getActionSpace(): Promise<DeviceAction[]> {
@@ -519,35 +518,23 @@ export class Agent<
     currentDump.executions.push(execution);
   }
 
-  dumpDataString() {
+  dumpDataString(opt?: { inlineScreenshots?: boolean }) {
     // update dump info
     this.dump.groupName = this.opts.groupName!;
     this.dump.groupDescription = this.opts.groupDescription;
+    if (ifInBrowser || opt?.inlineScreenshots) {
+      return this.dump.serializeWithInlineScreenshots();
+    }
     return this.dump.serialize();
   }
 
-  reportHTMLString() {
-    return reportHTMLContent(this.dumpDataString());
+  reportHTMLString(opt?: { inlineScreenshots?: boolean }) {
+    return reportHTMLContent(this.dumpDataString(opt));
   }
 
   writeOutActionDumps() {
-    if (this.destroyed) {
-      throw new Error(
-        'PageAgent has been destroyed. Cannot update report file.',
-      );
-    }
-    const { generateReport, autoPrintReportMsg } = this.opts;
-    this.reportFile = writeLogFile({
-      fileName: this.reportFileName!,
-      fileExt: groupedActionDumpFileExt,
-      fileContent: this.dumpDataString(),
-      type: 'dump',
-      generateReport,
-    });
-    debug('writeOutActionDumps', this.reportFile);
-    if (generateReport && autoPrintReportMsg && this.reportFile) {
-      printReportMsg(this.reportFile);
-    }
+    this.reportGenerator.onDumpUpdate(this.dump);
+    this.reportFile = this.reportGenerator.getReportPath();
   }
 
   private async callbackOnTaskStartTip(task: ExecutionTask) {
@@ -1082,7 +1069,7 @@ export class Agent<
       assert(text.description, `failed to describe element at [${center}]`);
       resultPrompt = text.description;
 
-      // Don't pass deepThink to verification locate â€?the description was generated
+      // Don't pass deepThink to verification locate ï¿½?the description was generated
       // from a cropped view (deepThink describe), but verification should use regular
       // locate on the full screenshot to confirm the description works universally.
       // Passing deepThink here would trigger AiLocateSection with an element-level
@@ -1335,6 +1322,10 @@ export class Agent<
       return;
     }
 
+    await this.reportGenerator.flush();
+    await this.reportGenerator.finalize(this.dump);
+    this.reportFile = this.reportGenerator.getReportPath();
+
     await this.interface.destroy?.();
     this.resetDump(); // reset dump to release memory
     this.destroyed = true;
@@ -1360,6 +1351,7 @@ export class Agent<
     ];
     // 3. build ExecutionTaskLog
     const task: ExecutionTaskLog = {
+      taskId: uuid(),
       type: 'Log',
       subType: 'Screenshot',
       status: 'finished',
@@ -1395,6 +1387,7 @@ export class Agent<
     }
 
     this.writeOutActionDumps();
+    await this.reportGenerator.flush();
   }
 
   /**
@@ -1552,6 +1545,13 @@ export const createAgent = (
 ) => {
   return new Agent(interfaceInstance, opts);
 };
+
+
+
+
+
+
+
 
 
 

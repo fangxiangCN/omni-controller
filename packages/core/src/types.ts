@@ -1,5 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { join } from 'node:path';
 import type { NodeType } from '@omni/shared/constants';
 import type { CreateOpenAIClientFn, TModelConfig } from '@omni/shared/env';
 import type {
@@ -10,6 +18,7 @@ import type {
 } from '@omni/shared/types';
 import type { z } from 'zod';
 import type { TUserPrompt } from './common';
+import { restoreImageReferences } from './dump/image-restoration';
 import { ScreenshotItem } from './screenshot-item';
 import type {
   DetailedLocateParam,
@@ -377,6 +386,7 @@ export type ExecutionTask<
       ? TaskLog
       : unknown
   > & {
+    taskId: string;
     status: 'pending' | 'running' | 'finished' | 'failed' | 'cancelled';
     error?: Error;
     errorMessage?: string;
@@ -416,14 +426,26 @@ function replacerForDumpSerialization(_key: string, value: any): any {
 }
 
 /**
- * Reviver function for JSON deserialization that restores ScreenshotItem from base64 strings
- * Automatically converts screenshot fields (in uiContext and recorder) from strings back to ScreenshotItem
+ * Reviver function for JSON deserialization that handles ScreenshotItem formats.
+ *
+ * BEHAVIOR:
+ * - For { $screenshot: "id" } format: Left as-is (plain object)
+ *   Consumer must use imageMap to restore base64 data
+ * - For { base64: "..." } format: Left as-is (plain object)
  */
 function reviverForDumpDeserialization(key: string, value: any): any {
-  // Restore screenshot fields in uiContext and recorder
-  if (key === 'screenshot' && ScreenshotItem.isSerializedData(value)) {
-    return ScreenshotItem.fromSerializedData(value);
+  if (key !== 'screenshot' || typeof value !== 'object' || value === null) {
+    return value;
   }
+
+  if (ScreenshotItem.isSerialized(value)) {
+    return value;
+  }
+
+  if ('base64' in value && typeof value.base64 === 'string') {
+    return value;
+  }
+
   return value;
 }
 
@@ -460,7 +482,10 @@ export class ExecutionDump implements IExecutionDump {
       logTime: this.logTime,
       name: this.name,
       description: this.description,
-      tasks: this.tasks,
+      tasks: this.tasks.map((task) => ({
+        ...task,
+        recorder: task.recorder || [],
+      })),
       aiActContext: this.aiActContext,
     };
   }
@@ -481,6 +506,30 @@ export class ExecutionDump implements IExecutionDump {
    */
   static fromJSON(data: IExecutionDump): ExecutionDump {
     return new ExecutionDump(data);
+  }
+
+  /**
+   * Collect all ScreenshotItem instances from tasks.
+   * Scans through uiContext and recorder items to find screenshots.
+   */
+  collectScreenshots(): ScreenshotItem[] {
+    const screenshots: ScreenshotItem[] = [];
+
+    for (const task of this.tasks) {
+      if (task.uiContext?.screenshot instanceof ScreenshotItem) {
+        screenshots.push(task.uiContext.screenshot);
+      }
+
+      if (task.recorder) {
+        for (const record of task.recorder) {
+          if (record.screenshot instanceof ScreenshotItem) {
+            screenshots.push(record.screenshot);
+          }
+        }
+      }
+    }
+
+    return screenshots;
   }
 }
 
@@ -642,6 +691,32 @@ export class GroupedActionDump implements IGroupedActionDump {
   }
 
   /**
+   * Serialize the GroupedActionDump with inline screenshots to a JSON string.
+   * Each ScreenshotItem is replaced with { base64: "..." }.
+   */
+  serializeWithInlineScreenshots(indents?: number): string {
+    const processValue = (obj: unknown): unknown => {
+      if (obj instanceof ScreenshotItem) {
+        return { base64: obj.base64 };
+      }
+      if (Array.isArray(obj)) {
+        return obj.map(processValue);
+      }
+      if (obj && typeof obj === 'object') {
+        const entries = Object.entries(obj).map(([key, value]) => [
+          key,
+          processValue(value),
+        ]);
+        return Object.fromEntries(entries);
+      }
+      return obj;
+    };
+
+    const data = processValue(this.toJSON());
+    return JSON.stringify(data, null, indents);
+  }
+
+  /**
    * Convert to a plain object for JSON serialization
    */
   toJSON(): IGroupedActionDump {
@@ -670,6 +745,102 @@ export class GroupedActionDump implements IGroupedActionDump {
    */
   static fromJSON(data: IGroupedActionDump): GroupedActionDump {
     return new GroupedActionDump(data);
+  }
+
+  /**
+   * Collect all ScreenshotItem instances from all executions.
+   */
+  collectAllScreenshots(): ScreenshotItem[] {
+    const screenshots: ScreenshotItem[] = [];
+    for (const execution of this.executions) {
+      screenshots.push(...execution.collectScreenshots());
+    }
+    return screenshots;
+  }
+
+  /**
+   * Serialize the dump to files with screenshots as separate PNG files.
+   */
+  serializeToFiles(basePath: string): void {
+    const screenshotsDir = `${basePath}.screenshots`;
+    if (!existsSync(screenshotsDir)) {
+      mkdirSync(screenshotsDir, { recursive: true });
+    }
+
+    const screenshotMap: Record<string, string> = {};
+    const screenshots = this.collectAllScreenshots();
+
+    for (const screenshot of screenshots) {
+      if (screenshot.hasBase64()) {
+        const imagePath = join(screenshotsDir, `${screenshot.id}.png`);
+        const rawBase64 = screenshot.rawBase64;
+        const bytes = Buffer.from(rawBase64, 'base64');
+        writeFileSync(imagePath, new Uint8Array(bytes));
+        screenshotMap[screenshot.id] = imagePath;
+      }
+    }
+
+    writeFileSync(
+      `${basePath}.screenshots.json`,
+      JSON.stringify(screenshotMap),
+      'utf-8',
+    );
+
+    writeFileSync(basePath, this.serialize(), 'utf-8');
+  }
+
+  /**
+   * Read dump from files and return JSON string with inline screenshots.
+   */
+  static fromFilesAsInlineJson(basePath: string): string {
+    const dumpString = readFileSync(basePath, 'utf-8');
+    const screenshotsMapPath = `${basePath}.screenshots.json`;
+
+    if (!existsSync(screenshotsMapPath)) {
+      return dumpString;
+    }
+
+    const imageMap = JSON.parse(
+      readFileSync(screenshotsMapPath, 'utf-8'),
+    ) as Record<string, string>;
+
+    const dumpData = JSON.parse(
+      dumpString,
+      reviverForDumpDeserialization,
+    ) as IGroupedActionDump;
+
+    const processedData = restoreImageReferences(dumpData, imageMap);
+    return JSON.stringify(processedData, null, 2);
+  }
+
+  /**
+   * Clean up all files associated with a serialized dump.
+   */
+  static cleanupFiles(basePath: string): void {
+    const filesToClean = [
+      basePath,
+      `${basePath}.screenshots.json`,
+      `${basePath}.screenshots`,
+    ];
+
+    for (const filePath of filesToClean) {
+      try {
+        rmSync(filePath, { force: true, recursive: true });
+      } catch {
+        // Ignore errors - file may already be deleted
+      }
+    }
+  }
+
+  /**
+   * Get all file paths associated with a serialized dump.
+   */
+  static getFilePaths(basePath: string): string[] {
+    return [
+      basePath,
+      `${basePath}.screenshots.json`,
+      `${basePath}.screenshots`,
+    ];
   }
 }
 
@@ -778,6 +949,12 @@ export interface AgentOpt {
   generateReport?: boolean;
   /* if auto print report msg, default true */
   autoPrintReportMsg?: boolean;
+  /**
+   * Use directory-based report format with separate image files.
+   *
+   * @default 'single-html'
+   */
+  outputFormat?: 'single-html' | 'html-and-external-assets';
   onTaskStartTip?: OnTaskStartTip;
   aiActContext?: string;
   aiActionContext?: string;

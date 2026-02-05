@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process';
+ï»¿import { execFile } from 'node:child_process';
 import * as fs from 'node:fs';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -110,7 +110,7 @@ export function insertScriptBeforeClosingHtml(
   const tailStr = buffer.toString('utf8');
   const htmlEndIdx = tailStr.lastIndexOf(htmlEndTag);
   if (htmlEndIdx === -1) {
-    throw new Error(`No </html> found in fileï¼?{filePath}`);
+    throw new Error(`No </html> found in fileï¿½?{filePath}`);
   }
 
   // calculate the correct byte position: char position to byte position
@@ -146,7 +146,7 @@ export function reportHTMLContent(
     // do not use template string here, will cause bundle error
     dumpContent =
       // biome-ignore lint/style/useTemplate: <explanation>
-      '<script type="OMNI_web_dump" type="application/json">\n' +
+      '<script type="midscene_web_dump" type="application/json">\n' +
       escapeScriptTag(dumpData) +
       '\n</script>';
   } else {
@@ -158,7 +158,7 @@ export function reportHTMLContent(
     dumpContent =
       // do not use template string here, will cause bundle error
       // biome-ignore lint/style/useTemplate: <explanation>
-      '<script type="OMNI_web_dump" type="application/json" ' +
+      '<script type="midscene_web_dump" type="application/json" ' +
       attributesArr.join(' ') +
       '>\n' +
       escapeScriptTag(dumpString) +
@@ -411,6 +411,7 @@ export async function uploadTestInfoToServer({
     lastReportedRepoUrl = repoUrl;
   }
 }
+
 
 
 

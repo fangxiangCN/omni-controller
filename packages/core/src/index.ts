@@ -65,5 +65,8 @@ export {
   generateDumpScriptTag,
 } from './dump'
 
+export type { IReportGenerator } from './report-generator'
+export { ReportGenerator, nullReportGenerator } from './report-generator'
+
 export { ScreenshotItem } from './screenshot-item'
-export type { SerializedScreenshotItem } from './screenshot-item'
+export type { SerializedScreenshotItem, ScreenshotSerializeFormat } from './screenshot-item'

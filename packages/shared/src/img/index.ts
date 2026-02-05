@@ -17,4 +17,5 @@ export {
   compositeElementInfoImg,
   annotateRects,
 } from './box-select';
+export { isUsingCanvasFallback } from './get-photon';
 
