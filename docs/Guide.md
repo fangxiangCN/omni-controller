@@ -15,7 +15,7 @@
 
 - Android: `references/aya`（Electron + adbkit + scrcpy + @yume-chan/scrcpy）
 - HarmonyOS: `references/echo`（Electron + hdckit + UiDriver）
-- AI Core / Web: `references/midscene`（源码已融入 packages/core 与 packages/shared）
+- AI Core / Web: `references/midscene`（源码已融入 packages/core、packages/shared、packages/visualizer、packages/playground、packages/web）
 
 ---
 
@@ -31,9 +31,9 @@
 ## 2. 技术栈（已落地）
 
 - Runtime: Electron + Node.js
-- Frontend: Vue 3 + Vite
-- UI: TDesign Vue Next
-- State: Pinia
+- Frontend: React + Vite
+- UI: Ant Design
+- State: Zustand
 - Lang: TypeScript
 - Monorepo: pnpm workspace (`apps/*`, `packages/*`)
 
@@ -44,18 +44,20 @@
 ```
 omni-controller/
   apps/
-    desktop/
-      electron/            # main/preload/IPC/scheduler
-      src/                 # renderer (Vue + TDesign)
+    desktop-react/
+      electron/            # main/preload/IPC
+      src/                 # renderer (React + AntD + @omni/visualizer)
   packages/
     core/                  # Midscene Agent 适配 + Midscene core 源码融合
     shared/                # IPC 类型 + Midscene shared 最小集
+    visualizer/            # Midscene visualizer 迁移
+    playground/            # Midscene playground 迁移
+    web/                   # Midscene web-integration 迁移
     drivers/
       interface/           # IDeviceAdapter 定义
       android/             # Android 驱动（adbkit + scrcpy）
       ohos/                # HarmonyOS 驱动（占位）
       web/                 # Web 驱动（占位）
-    shared/                # IPC 事件与类型
   resources/
     bin/
       android/scrcpy.jar
@@ -115,12 +117,9 @@ export enum IpcChannels {
 
 ## 7. Agent Loop（当前实现）
 
-- 入口：`apps/desktop/electron/task-scheduler.ts`
-- 流程：
-  1) 校验模型配置（.env）
-  2) Midscene `Agent.aiAct(instruction)`
-  3) 通过 `IDeviceAdapter.actionSpace()` 执行动作
-  4) IPC 回传日志与状态
+- 入口：`apps/desktop-react/electron/main.ts`（IPC 注册已打底）
+- Agent 逻辑：`packages/core`（对齐 Midscene Agent）
+- 待接入：TaskScheduler + DeviceManager + IPC 全链路（见 UI 文档与 Roadmap）
 
 ---
 
@@ -134,6 +133,6 @@ export enum IpcChannels {
 
 ## 9. 下一步建议（优先级）
 
-1) Android 收尾：控制通道稳定性、异常重连、日志与错误回传细化
-2) UI 端：完成一条完整链路（选设备 -> 任务执行 -> 日志/进度 -> 结果）
-3) HarmonyOS/Web 驱动按 references 接入
+1) Desktop 端：打通 IPC 与 TaskScheduler，完成一条完整链路（选设备 -> 任务执行 -> 日志/进度 -> 结果）
+2) Report/Visualizer：对齐 Midscene 报告与回放逻辑（packages/visualizer/playground/web）
+3) Android 收尾：控制通道稳定性、异常重连、日志与错误回传细化

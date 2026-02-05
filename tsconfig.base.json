@@ -10,6 +10,12 @@
       "@omni/shared/*": ["packages/shared/src/*"],
       "@omni/core": ["packages/core/src"],
       "@omni/core/*": ["packages/core/src/*"],
+      "@omni/visualizer": ["packages/visualizer/src"],
+      "@omni/visualizer/*": ["packages/visualizer/src/*"],
+      "@omni/playground": ["packages/playground/src"],
+      "@omni/playground/*": ["packages/playground/src/*"],
+      "@omni/web": ["packages/web/src"],
+      "@omni/web/*": ["packages/web/src/*"],
       "@omni/drivers-android": ["packages/drivers/android/src"],
       "@omni/drivers-interface": ["packages/drivers/interface/src"],
       "@/*": ["packages/core/src/*"]

@@ -1,10 +1,10 @@
 ﻿# 03 路线图与里程碑
 
-日期: 2026-02-02
+日期: 2026-02-05
 
 阶段 1: 脚手架与基础
 - Monorepo 初始化 (pnpm workspace)
-- Electron + Vue 3 + TDesign
+- Electron + React + Vite
 - 基础 IPC 桥接
 
 阶段 2: Core 适配
@@ -26,9 +26,9 @@
 - capture/tap/scroll/keyboard
 
 阶段 6: 统一 Agent Loop 与 UI
-- 任务调度器
-- 日志与帧流展示
-- 基础回放与记录
+- Electron Main TaskScheduler
+- Renderer 任务流转与状态展示
+- 回放与报告查看（@omni/visualizer）
 
 阶段 7: 稳定性与打包
 - 资源路径适配

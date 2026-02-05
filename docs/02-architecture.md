@@ -3,10 +3,13 @@
 日期: 2026-02-05
 
 总体结构
-- apps/desktop: Electron 主应用 (main/renderer/preload)
+- apps/desktop-react: Electron 主应用 (main/renderer/preload)
 - packages/core: Midscene Agent 适配层
 - packages/drivers: Android / HarmonyOS / Web 驱动
 - packages/shared: IPC 事件与通用类型
+- packages/visualizer: Midscene visualizer 迁移
+- packages/playground: Midscene playground 迁移
+- packages/web: Midscene web-integration 迁移
 - resources/bin: adb/hdc/uitest_agent 等二进制资源
 
 核心模块
@@ -27,6 +30,7 @@
 - HarmonyOS: JPEG 直接 drawImage
 - Web: screenshot 或 DOM 展示
 - Timeline: 展示 Agent 执行日志
+- UI: React + Ant Design，报告与回放使用 @omni/visualizer
 
 统一 Agent Loop
 - 获取 UIContext
@@ -37,7 +41,7 @@
 当前实现补充
 - main: 已接入 IPC（task:start / task:log / task:state / device:list / device:frame / device:select）
 - Android: adbkit + scrcpy reverseTcp 已打通，H.264 通过 IPC 流入 renderer
-- renderer: ScreenCanvas 支持 JPEG/H.264 占位解码路径
+- renderer: React UI 框架已搭建，ScreenCanvas/Report/Playground 组件迁移中
 
 约束
 - AI 输出仅 Midscene 模式

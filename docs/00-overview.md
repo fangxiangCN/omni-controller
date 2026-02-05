@@ -12,6 +12,7 @@
 - 04-progress.md: 进度跟踪与状态
 - 05-interfaces.md: 关键接口与协议
 - 06-decisions.md: 重要设计决策与理由
+ - 07-model-config.md: 模型配置与默认参数
 
 关键约束:
 - AI 输出格式只支持 Midscene 模式
