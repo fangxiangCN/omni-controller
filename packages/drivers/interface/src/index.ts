@@ -1,5 +1,5 @@
 ﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared'
-import type { DeviceAction } from '@midscene/core'
+import type { DeviceAction } from '@omni/core'
 
 export interface IDeviceAdapter {
   interfaceType: string

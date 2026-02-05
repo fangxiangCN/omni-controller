@@ -1,5 +1,5 @@
 ﻿import type { ScrcpyOptions3_1 } from '@yume-chan/scrcpy'
-import { ScrcpyControlMessageWriter, ScrcpyVideoCodecId } from '@yume-chan/scrcpy'
+import { ScrcpyVideoCodecId } from '@yume-chan/scrcpy'
 import {
   BufferedReadableStream,
   PushReadableStream,
@@ -20,7 +20,7 @@ export class AndroidStreamDecoder {
     return this.renderer.element
   }
 
-  async attach(videoStream: ReadableStream<Uint8Array>, options: ScrcpyOptions3_1) {
+  async attach(videoStream: ReadableStream<Uint8Array>, options: ScrcpyOptions3_1<any>) {
     const { stream, metadata } = await options.parseVideoStreamMetadata(videoStream)
 
     let codec: ScrcpyVideoCodecId = ScrcpyVideoCodecId.H264
@@ -60,10 +60,4 @@ export async function detectAudioStream(stream: ReadableStream<Uint8Array>) {
     audio: codecMetadataValue !== 0x00_00_00_00,
     stream: readableStream,
   }
-}
-
-export function getControlWriter(pair: {
-  writable: WritableStream<Uint8Array>
-}) {
-  return new ScrcpyControlMessageWriter(pair.writable.getWriter())
 }

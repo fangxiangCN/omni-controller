@@ -1,6 +1,6 @@
 ﻿# 02 架构与核心模块
 
-日期: 2026-02-02
+日期: 2026-02-05
 
 总体结构
 - apps/desktop: Electron 主应用 (main/renderer/preload)
@@ -14,6 +14,7 @@
 - 入口: Agent.aiAct(), aiLocate(), aiTap()/aiInput()/aiScroll()
 - 依赖: TaskExecutor + Service
 - 特性: screenshot scale 处理, report dump, cache, replanning
+- 实现来源: references/midscene 源码融合到 packages/core 与 packages/shared（最小依赖集）
 
 2) Drivers
 - 统一设备抽象: IDeviceAdapter (见 05-interfaces.md)
@@ -41,4 +42,5 @@
 约束
 - AI 输出仅 Midscene 模式
 - Scrcpy 音频/控制/视频连接顺序需识别
+- Scrcpy 使用 scid 与 localabstract:scrcpy_{scid} 对齐
 - HarmonyOS UiDriver 依赖固定版本 so

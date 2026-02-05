@@ -38,7 +38,7 @@ export class ScrcpyClient {
   private controlReady?: Promise<void>
   private controlReadyResolve?: () => void
   private scid = ''
-  private options: ScrcpyOptions3_1
+  private options: ScrcpyOptions3_1<any>
   private videoConnected = false
 
   constructor(
@@ -54,16 +54,14 @@ export class ScrcpyClient {
       clipboardAutosync: false,
       stayAwake: false,
     })
+    this.options.value.scid = this.scid
   }
 
   async start(): Promise<void> {
     const jarPath = resolveScrcpyJarPath()
     await this.adb.push(this.deviceId, jarPath, SCRCPY_REMOTE_PATH)
 
-    const args: string[] = []
-    if (this.scrcpyOptions?.videoBitRate) args.push(`--bit-rate=${this.scrcpyOptions.videoBitRate}`)
-    if (this.scrcpyOptions?.maxSize) args.push(`--max-size=${this.scrcpyOptions.maxSize}`)
-    if (this.scrcpyOptions?.audio === false) args.push('--no-audio')
+    const args = this.options.serialize()
 
     const cmd = `CLASSPATH=${SCRCPY_REMOTE_PATH} app_process /system/bin com.genymobile.scrcpy.Server 3.1 ${args.join(
       ' ',
@@ -94,7 +92,8 @@ export class ScrcpyClient {
         if (!this.videoConnected) {
           this.videoConnected = true
           socket.on('data', (chunk) => {
-            onFrame({ data: new Uint8Array(chunk), format: 'h264' })
+            const buf = typeof chunk === 'string' ? Buffer.from(chunk) : Buffer.from(chunk as any)
+            onFrame({ data: new Uint8Array(buf), format: 'h264' })
           })
           socket.on('close', () => {})
           return
@@ -147,7 +146,7 @@ export class ScrcpyClient {
       pressure: 1,
       actionButton: AndroidMotionEventButton.Primary,
       buttons: 1,
-    })
+    } as any)
     writer.injectTouch({
       action: AndroidMotionEventAction.Up,
       pointerId: 1n,
@@ -158,7 +157,7 @@ export class ScrcpyClient {
       pressure: 0,
       actionButton: AndroidMotionEventButton.Primary,
       buttons: 0,
-    })
+    } as any)
   }
 
   async scroll(dx: number, dy: number, size: DeviceSize): Promise<void> {
@@ -173,7 +172,7 @@ export class ScrcpyClient {
       scrollX: -dx / 100,
       scrollY: -dy / 100,
       buttons: 0,
-    })
+    } as any)
   }
 
   async type(text: string): Promise<void> {
@@ -181,6 +180,75 @@ export class ScrcpyClient {
     writer.injectText(text)
   }
 
+  async longPress(x: number, y: number, size: DeviceSize, durationMs = 500): Promise<void> {
+    const writer = await this.getControlWriter()
+    writer.injectTouch({
+      action: AndroidMotionEventAction.Down,
+      pointerId: 1n,
+      screenWidth: size.width,
+      screenHeight: size.height,
+      pointerX: x,
+      pointerY: y,
+      pressure: 1,
+      actionButton: AndroidMotionEventButton.Primary,
+      buttons: 1,
+    } as any)
+    await delay(durationMs)
+    writer.injectTouch({
+      action: AndroidMotionEventAction.Up,
+      pointerId: 1n,
+      screenWidth: size.width,
+      screenHeight: size.height,
+      pointerX: x,
+      pointerY: y,
+      pressure: 0,
+      actionButton: AndroidMotionEventButton.Primary,
+      buttons: 0,
+    } as any)
+  }
+
+  async swipe(
+    start: [number, number],
+    end: [number, number],
+    size: DeviceSize,
+    durationMs = 300,
+  ): Promise<void> {
+    const writer = await this.getControlWriter()
+    writer.injectTouch({
+      action: AndroidMotionEventAction.Down,
+      pointerId: 1n,
+      screenWidth: size.width,
+      screenHeight: size.height,
+      pointerX: start[0],
+      pointerY: start[1],
+      pressure: 1,
+      actionButton: AndroidMotionEventButton.Primary,
+      buttons: 1,
+    } as any)
+    await delay(durationMs)
+    writer.injectTouch({
+      action: AndroidMotionEventAction.Move,
+      pointerId: 1n,
+      screenWidth: size.width,
+      screenHeight: size.height,
+      pointerX: end[0],
+      pointerY: end[1],
+      pressure: 1,
+      actionButton: AndroidMotionEventButton.Primary,
+      buttons: 1,
+    } as any)
+    writer.injectTouch({
+      action: AndroidMotionEventAction.Up,
+      pointerId: 1n,
+      screenWidth: size.width,
+      screenHeight: size.height,
+      pointerX: end[0],
+      pointerY: end[1],
+      pressure: 0,
+      actionButton: AndroidMotionEventButton.Primary,
+      buttons: 0,
+    } as any)
+  }
   async back(): Promise<void> {
     const writer = await this.getControlWriter()
     writer.injectKeyCode({
@@ -238,7 +306,8 @@ export class ScrcpyClient {
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        await controller.enqueue(value)
+        const buf = typeof value === 'string' ? Buffer.from(value) : Buffer.from(value as any)
+        await controller.enqueue(new Uint8Array(buf))
       }
     })
 
@@ -281,7 +350,10 @@ function buildScid(deviceId: string): string {
 function socketToReadableStream(socket: net.Socket) {
   return new ReadableStream<Uint8Array>({
     start(controller) {
-      socket.on('data', (data) => controller.enqueue(data))
+      socket.on('data', (data) => {
+        const buf = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data as any)
+        controller.enqueue(new Uint8Array(buf))
+      })
       socket.on('end', () => controller.close())
       socket.on('error', (e) => controller.error(e))
     },
@@ -331,4 +403,8 @@ async function waitFor(promise: Promise<void>, timeoutMs: number, message: strin
   } finally {
     if (timeout) clearTimeout(timeout)
   }
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

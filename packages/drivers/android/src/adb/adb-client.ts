@@ -13,7 +13,10 @@ export class AdbClient {
 
   async listDevices(): Promise<AdbDeviceInfo[]> {
     const devices = await this.client.listDevices()
-    return devices.map((d) => ({ id: d.id, state: d.type }))
+    return devices.map((d: { id: string; type: string }) => ({
+      id: d.id,
+      state: d.type,
+    }))
   }
 
   async shell(deviceId: string, cmd: string): Promise<string> {
@@ -54,7 +57,7 @@ export class AdbClient {
     const transfer = await device.push(localPath, remotePath)
     await new Promise<void>((resolve, reject) => {
       transfer.on('end', () => resolve())
-      transfer.on('error', (err) => reject(err))
+      transfer.on('error', (err: Error) => reject(err))
     })
   }
 }

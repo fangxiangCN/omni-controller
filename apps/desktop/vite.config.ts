@@ -5,6 +5,18 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@omni/shared': path.resolve(__dirname, '../../packages/shared/src'),
+      '@omni/shared/': `${path.resolve(__dirname, '../../packages/shared/src')}/`,
+      '@omni/core': path.resolve(__dirname, '../../packages/core/src'),
+      '@omni/core/': `${path.resolve(__dirname, '../../packages/core/src')}/`,
+      '@': path.resolve(__dirname, '../../packages/core/src'),
+      '@/': `${path.resolve(__dirname, '../../packages/core/src')}/`,
+      '@omni/drivers-android': path.resolve(__dirname, '../../packages/drivers/android/src'),
+      '@omni/drivers-interface': path.resolve(__dirname, '../../packages/drivers/interface/src'),
+    },
+  },
   plugins: [
     vue(),
     electron({

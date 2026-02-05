@@ -7,8 +7,8 @@ import {
   defineActionKeyboardPress,
   defineActionLongPress,
   defineActionSwipe,
-} from '@midscene/core/device'
-import type { DeviceAction } from '@midscene/core'
+} from '@omni/core/device'
+import type { DeviceAction } from '@omni/core'
 import { AdbClient } from './adb/adb-client'
 import { ScrcpyClient } from './scrcpy/scrcpy-client'
 import { safeStop } from './lifecycle'
@@ -107,13 +107,15 @@ export class AndroidAdapter implements IDeviceAdapter {
       }),
       defineActionLongPress(async (param) => {
         const { center } = param.locate
-        await this.adb.shell(this.deviceId, `input swipe ${center[0]} ${center[1]} ${center[0]} ${center[1]} 500`)
+        const size = await this.ensureSize()
+        await this.scrcpy?.longPress(center[0], center[1], size, 500)
       }),
       defineActionSwipe(async (param) => {
         const start = param.start?.center
         const end = param.end?.center
         if (start && end) {
-          await this.adb.shell(this.deviceId, `input swipe ${start[0]} ${start[1]} ${end[0]} ${end[1]}`)
+          const size = await this.ensureSize()
+          await this.scrcpy?.swipe(start, end, size)
           return
         }
         const dir = param.direction || 'down'

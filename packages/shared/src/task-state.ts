@@ -5,3 +5,4 @@ export type TaskState = {
   startedAt?: number;
   finishedAt?: number;
 };
+

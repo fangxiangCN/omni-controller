@@ -3,6 +3,17 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "typeRoots": ["./types", "./node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "@omni/shared": ["packages/shared/src"],
+      "@omni/shared/*": ["packages/shared/src/*"],
+      "@omni/core": ["packages/core/src"],
+      "@omni/core/*": ["packages/core/src/*"],
+      "@omni/drivers-android": ["packages/drivers/android/src"],
+      "@omni/drivers-interface": ["packages/drivers/interface/src"],
+      "@/*": ["packages/core/src/*"]
+    },
     "strict": true,
     "isolatedModules": true,
     "skipLibCheck": true

@@ -1,4 +1,4 @@
-import type { DeviceFrame, DeviceInfo, DeviceListPayload } from '@omni/shared'
+﻿import type { DeviceFrame, DeviceInfo, DeviceListPayload } from '@omni/shared'
 import { AndroidAdapter } from '@omni/drivers-android'
 
 type DeviceManagerCallbacks = {
@@ -16,7 +16,10 @@ export class DeviceManager {
   private android = new AndroidAdapter()
   private activeDeviceId = ''
   private pollTimer?: ReturnType<typeof setInterval>
+  private monitorTimer?: ReturnType<typeof setInterval>
+  private retryTimer?: ReturnType<typeof setTimeout>
   private streaming = false
+  private lastFrameAt = 0
 
   constructor(private callbacks: DeviceManagerCallbacks) {}
 
@@ -33,14 +36,31 @@ export class DeviceManager {
     this.pollTimer = setInterval(() => {
       this.refreshDevices().catch(() => {})
     }, intervalMs)
+    if (!this.monitorTimer) {
+      this.monitorTimer = setInterval(() => {
+        this.monitorStream().catch(() => {})
+      }, 3000)
+    }
   }
 
   stopPolling() {
     if (this.pollTimer) clearInterval(this.pollTimer)
+    if (this.monitorTimer) clearInterval(this.monitorTimer)
   }
 
   async refreshDevices() {
     const androidDevices = await this.android.listDevices()
+    const activeExists =
+      !this.activeDeviceId || androidDevices.some((d: DeviceInfo) => d.id === this.activeDeviceId)
+    if (!activeExists) {
+      await this.android.disconnect()
+      this.streaming = false
+      this.activeDeviceId = ''
+      this.callbacks.onLog({
+        type: 'error',
+        content: '当前设备已断开连接',
+      })
+    }
     this.callbacks.onDeviceList({ devices: [...androidDevices, ...NON_ANDROID_DEVICES] })
   }
 
@@ -79,12 +99,53 @@ export class DeviceManager {
     if (this.streaming) return
     if (!this.activeDeviceId) return
     this.streaming = true
-    await this.android.startStream((frame: DeviceFrame) => {
-      this.callbacks.onFrame({
-        deviceId: this.activeDeviceId,
-        format: frame.format,
-        data: frame.data,
+    try {
+      await this.android.startStream((frame: DeviceFrame) => {
+        this.lastFrameAt = Date.now()
+        this.callbacks.onFrame({
+          deviceId: this.activeDeviceId,
+          format: frame.format,
+          data: frame.data,
+        })
       })
+    } catch (e: any) {
+      this.streaming = false
+      this.callbacks.onLog({
+        type: 'error',
+        content: `流启动失败: ${e?.message || e}`,
+      })
+      this.scheduleRetry()
+    }
+  }
+
+  private scheduleRetry() {
+    if (this.retryTimer) clearTimeout(this.retryTimer)
+    if (!this.activeDeviceId) return
+    this.retryTimer = setTimeout(() => {
+      this.ensureStream().catch(() => {})
+    }, 2000)
+  }
+
+  private async monitorStream() {
+    if (!this.streaming || !this.activeDeviceId) return
+    if (!this.lastFrameAt) return
+    if (Date.now() - this.lastFrameAt < 5000) return
+
+    this.callbacks.onLog({
+      type: 'error',
+      content: '画面流断开，正在尝试重连',
     })
+    this.streaming = false
+    await this.android.disconnect()
+    const result = await this.android.connectWithResult?.(this.activeDeviceId)
+    if (!result?.ok) {
+      this.callbacks.onLog({
+        type: 'error',
+        content: `重连失败: ${this.activeDeviceId} (${result?.error || 'unknown'})`,
+      })
+      this.scheduleRetry()
+      return
+    }
+    await this.ensureStream()
   }
 }

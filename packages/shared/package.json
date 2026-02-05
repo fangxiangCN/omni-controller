@@ -3,6 +3,32 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts"
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./constants": "./src/constants/index.ts",
+    "./env": "./src/env/index.ts",
+    "./extractor": "./src/extractor/index.ts",
+    "./extractor/dom-util": "./src/extractor/dom-util.ts",
+    "./img": "./src/img/index.ts",
+    "./logger": "./src/logger.ts",
+    "./utils": "./src/utils.ts",
+    "./common": "./src/common.ts",
+    "./node": "./src/node/index.ts",
+    "./types": "./src/types/index.ts",
+    "./zod-schema-utils": "./src/zod-schema-utils.ts",
+    "./us-keyboard-layout": "./src/us-keyboard-layout.ts"
+  },
+  "dependencies": {
+    "@silvia-odwyer/photon": "0.3.3",
+    "@silvia-odwyer/photon-node": "0.3.3",
+    "debug": "4.4.0",
+    "js-sha256": "0.11.0",
+    "langsmith": "^0.1.46",
+    "openai": "6.3.0",
+    "sharp": "^0.34.3",
+    "uuid": "11.1.0",
+    "zod": "3.24.3"
+  }
 }

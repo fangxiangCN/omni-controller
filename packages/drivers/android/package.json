@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@devicefarmer/adbkit": "^3.3.8",
+    "@omni/core": "workspace:*",
     "@omni/drivers-interface": "workspace:*",
     "@omni/shared": "workspace:*",
     "@yume-chan/no-data-view": "^2.0.0",

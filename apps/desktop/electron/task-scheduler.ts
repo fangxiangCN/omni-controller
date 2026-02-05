@@ -9,68 +9,98 @@ type SchedulerCallbacks = {
 
 export class TaskScheduler {
   private running = false
-  private agent = createAgentFromEnv(this.adapter)
+  private stopRequested = false
+  private startedAt = 0
+  private agent: ReturnType<typeof createAgentFromEnv>
 
   constructor(
     private adapter: IDeviceAdapter,
     private callbacks: SchedulerCallbacks,
-  ) {}
+  ) {
+    this.agent = createAgentFromEnv(this.adapter)
+  }
 
   resetAgent() {
     this.agent = createAgentFromEnv(this.adapter)
+  }
+
+  stop() {
+    if (!this.running) {
+      this.callbacks.onLog({
+        type: 'info',
+        content: 'µ±Ç°Ã»ÓĞÖ´ĞĞÖĞµÄÈÎÎñ',
+      })
+      return
+    }
+
+    this.stopRequested = true
+    this.running = false
+    this.callbacks.onLog({
+      type: 'info',
+      content: 'ÒÑÇëÇóÍ£Ö¹£ºµ±Ç°²½Öè¿ÉÄÜÈÔÔÚÖ´ĞĞ',
+    })
+    this.callbacks.onState({
+      status: 'error',
+      startedAt: this.startedAt || Date.now(),
+      finishedAt: Date.now(),
+    })
   }
 
   async start(instruction: string, deviceId: string) {
     if (this.running) {
       this.callbacks.onLog({
         type: 'error',
-        content: 'å·²æœ‰ä»»åŠ¡åœ¨æ‰§è¡Œï¼Œè¯·å…ˆåœæ­¢æˆ–ç­‰å¾…å®Œæˆ',
+        content: 'ÒÑÓĞÈÎÎñÔÚÖ´ĞĞ£¬ÇëÏÈÍ£Ö¹»òµÈ´ıÍê³É',
       })
       return
     }
 
-    if (!process.env.MIDSCENE_MODEL_NAME || !process.env.MIDSCENE_OPENAI_API_KEY) {
+    if (!process.env.Omni_MODEL_NAME || !process.env.Omni_OPENAI_API_KEY) {
       this.callbacks.onLog({
         type: 'error',
-        content: 'æ¨¡å‹é…ç½®ç¼ºå¤±: è¯·æ£€æŸ¥ .env ä¸­ MIDSCENE_MODEL_NAME / MIDSCENE_OPENAI_API_KEY',
+        content: 'Ä£ĞÍÅäÖÃÈ±Ê§£ºÇë¼ì²é .env ÖĞ Omni_MODEL_NAME / Omni_OPENAI_API_KEY',
       })
       return
     }
 
-    const startedAt = Date.now()
+    this.startedAt = Date.now()
+    this.stopRequested = false
     this.running = true
     this.callbacks.onState({
       status: 'running',
-      startedAt,
+      startedAt: this.startedAt,
     })
     this.callbacks.onLog({
       type: 'thought',
-      content: `æ”¶åˆ°ä»»åŠ¡: ${instruction} (device=${deviceId || 'default'})`,
+      content: `ÊÕµ½ÈÎÎñ: ${instruction} (device=${deviceId || 'default'})`,
     })
 
     try {
       await this.agent.aiAct(instruction)
+      if (this.stopRequested) return
       this.callbacks.onLog({
         type: 'info',
-        content: 'ä»»åŠ¡å®Œæˆ (Midscene)',
+        content: 'ÈÎÎñÍê³É (Omni)',
       })
       this.callbacks.onState({
         status: 'success',
-        startedAt,
+        startedAt: this.startedAt,
         finishedAt: Date.now(),
       })
     } catch (e: any) {
+      if (this.stopRequested) return
       this.callbacks.onLog({
         type: 'error',
-        content: `ä»»åŠ¡å¤±è´¥: ${e?.message || e}`,
+        content: `ÈÎÎñÊ§°Ü: ${e?.message || e}`,
       })
       this.callbacks.onState({
         status: 'error',
-        startedAt,
+        startedAt: this.startedAt,
         finishedAt: Date.now(),
       })
     } finally {
       this.running = false
+      this.stopRequested = false
     }
   }
 }

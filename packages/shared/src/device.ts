@@ -18,3 +18,4 @@ export type DeviceFrame = {
   data: Uint8Array
   format: 'h264' | 'jpeg'
 }
+

@@ -1,6 +1,6 @@
 ﻿# 04 进度跟踪
 
-日期: 2026-02-04
+日期: 2026-02-05
 
 状态说明
 - TODO: 未开始
@@ -22,3 +22,4 @@
 - 2026-02-04: Midscene Agent 适配接入与 IPC 桥接
 - 2026-02-04: Android 驱动收尾（scrcpy control + socket 顺序对齐 Aya）
 - 2026-02-04: 统一 Agent Loop 直连重构（DeviceManager + TaskScheduler）
+- 2026-02-05: Android scrcpy scid 与 serialize 逻辑对齐 Aya

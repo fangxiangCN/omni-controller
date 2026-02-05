@@ -1,5 +1,4 @@
 ﻿import { app, BrowserWindow, ipcMain } from 'electron'
-import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import {
@@ -7,13 +6,13 @@ import {
   IPC_DEVICE_LIST,
   IPC_DEVICE_SELECT,
   IPC_START_TASK,
+  IPC_STOP_TASK,
   IPC_TASK_LOG,
   IPC_TASK_STATE,
 } from '@omni/shared'
 import { DeviceManager } from './device-manager'
 import { TaskScheduler } from './task-scheduler'
 
-const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 process.env.APP_ROOT = path.join(__dirname, '..')
@@ -75,6 +74,10 @@ function registerIpc() {
     }
     await deviceManager.ensureStream()
     await scheduler.start(instruction, targetId)
+  })
+  ipcMain.on(IPC_STOP_TASK, () => {
+    if (!scheduler) return
+    scheduler.stop()
   })
 }
 

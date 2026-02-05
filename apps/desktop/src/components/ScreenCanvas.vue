@@ -13,13 +13,15 @@ type Frame = {
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const props = defineProps<{ deviceId?: string }>()
 const decoder = new AndroidStreamDecoder()
-let h264Controller: ReadableStreamDefaultController<Uint8Array> | null = null
+let h264Controller: { enqueue: (chunk: Uint8Array) => Promise<void> | void } | null = null
 let decoderStarted = false
 let ctx: CanvasRenderingContext2D | null = null
 
 function drawJpeg(frame: Frame) {
   if (!ctx || !canvasRef.value) return
-  const blob = new Blob([frame.data], { type: 'image/jpeg' })
+  const view = frame.data
+  const copy = new Uint8Array(view)
+  const blob = new Blob([copy.buffer], { type: 'image/jpeg' })
   const url = URL.createObjectURL(blob)
   const img = new Image()
   img.onload = () => {
@@ -43,7 +45,7 @@ function handleFrame(_event: unknown, payload: Frame & { deviceId?: string }) {
       const stream = new PushReadableStream<Uint8Array>(async (controller) => {
         h264Controller = controller
       })
-      const options = new ScrcpyOptions3_1({
+      const options = new ScrcpyOptions3_1<any>({
         audio: false,
         videoBitRate: 8000000,
         maxSize: 0,
