@@ -7,7 +7,7 @@ import { getBasicEnvValue } from './env/basic';
 import { MIDSCENE_RUN_DIR } from './env/types';
 import { ifInNode } from './utils';
 
-export const defaultRunDirName = 'midscene_run';
+export const defaultRunDirName = 'omni_run';
 // Define locally for now to avoid import issues
 
 export const getRunDir = () => {
@@ -65,4 +65,3 @@ export const getRunSubDir = (
 
 export const ERROR_CODE_NOT_IMPLEMENTED_AS_DESIGNED =
   'NOT_IMPLEMENTED_AS_DESIGNED';
-
