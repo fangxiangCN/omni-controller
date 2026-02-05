@@ -791,6 +791,10 @@ export class GroupedActionDump implements IGroupedActionDump {
 
   /**
    * Read dump from files and return JSON string with inline screenshots.
+   * Reads the dump JSON and screenshot files, then inlines the base64 data.
+   *
+   * @param basePath - Base path for the dump file
+   * @returns JSON string with inline screenshots ({ base64: "..." } format)
    */
   static fromFilesAsInlineJson(basePath: string): string {
     const dumpString = readFileSync(basePath, 'utf-8');
@@ -800,17 +804,23 @@ export class GroupedActionDump implements IGroupedActionDump {
       return dumpString;
     }
 
-    const imageMap = JSON.parse(
+    // Read screenshot map and build imageMap from files
+    const screenshotMap: Record<string, string> = JSON.parse(
       readFileSync(screenshotsMapPath, 'utf-8'),
-    ) as Record<string, string>;
+    );
 
-    const dumpData = JSON.parse(
-      dumpString,
-      reviverForDumpDeserialization,
-    ) as IGroupedActionDump;
+    const imageMap: Record<string, string> = {};
+    for (const [id, filePath] of Object.entries(screenshotMap)) {
+      if (existsSync(filePath)) {
+        const data = readFileSync(filePath);
+        imageMap[id] = `data:image/png;base64,${data.toString('base64')}`;
+      }
+    }
 
+    // Restore image references
+    const dumpData = JSON.parse(dumpString);
     const processedData = restoreImageReferences(dumpData, imageMap);
-    return JSON.stringify(processedData, null, 2);
+    return JSON.stringify(processedData);
   }
 
   /**
