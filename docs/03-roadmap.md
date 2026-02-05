@@ -26,8 +26,8 @@
 - capture/tap/scroll/keyboard
 
 阶段 6: 统一 Agent Loop 与 UI
-- Electron Main TaskScheduler
-- Renderer 任务流转与状态展示
+- Electron Main DeviceManager + PlaygroundServer
+- Renderer 通过 PlaygroundSDK 远程执行与状态展示
 - 回放与报告查看（@omni/visualizer）
 
 阶段 7: 稳定性与打包

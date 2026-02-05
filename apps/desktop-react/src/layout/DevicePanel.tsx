@@ -1,5 +1,8 @@
 ﻿import { Button, Divider, Tag } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
+import { useMemo } from 'react'
+import { useAppStore } from '../store/app'
+import type { DeviceInfo } from '@omni/shared'
 import './DevicePanel.less'
 
 type DevicePanelProps = {
@@ -7,28 +10,21 @@ type DevicePanelProps = {
   width: number
 }
 
-const mockDevices = [
-  {
-    id: 'ios-1',
-    name: 'iPhone 15 Pro',
-    info: 'iOS 17.1',
-    status: 'connected',
-  },
-  {
-    id: 'web-1',
-    name: 'Chrome - Web',
-    info: 'localhost:3000',
-    status: 'connected',
-  },
-  {
-    id: 'android-1',
-    name: 'Pixel 7',
-    info: 'Android 14',
-    status: 'disconnected',
-  },
-]
-
 export function DevicePanel({ collapsed }: DevicePanelProps) {
+  const devices = useAppStore((state) => state.devices)
+  const activeDeviceId = useAppStore((state) => state.activeDeviceId)
+  const setActiveDevice = useAppStore((state) => state.setActiveDevice)
+
+  const { connected, disconnected } = useMemo(() => {
+    const connected: DeviceInfo[] = []
+    const disconnected: DeviceInfo[] = []
+    devices.forEach((device) => {
+      if (device.type === 'android') connected.push(device)
+      else disconnected.push(device)
+    })
+    return { connected, disconnected }
+  }, [devices])
+
   return (
     <aside className={collapsed ? 'device-panel collapsed' : 'device-panel'}>
       <div className="panel-header">
@@ -43,21 +39,21 @@ export function DevicePanel({ collapsed }: DevicePanelProps) {
       {!collapsed && (
         <div className="device-groups">
           <div className="group-title">CONNECTED</div>
-          {mockDevices.slice(0, 2).map((device) => (
-            <div key={device.id} className="device-item connected">
+          {connected.map((device) => (
+            <div key={device.id} className={`device-item connected ${device.id === activeDeviceId ? 'active' : ''}`} onClick={() => setActiveDevice(device.id)}>
               <div className="device-info">
                 <div className="device-name">{device.name}</div>
-                <div className="device-sub">{device.info}</div>
+                <div className="device-sub">{device.id}</div>
               </div>
               <Tag color="green">online</Tag>
             </div>
           ))}
           <div className="group-title">DISCONNECTED</div>
-          {mockDevices.slice(2).map((device) => (
+          {disconnected.map((device) => (
             <div key={device.id} className="device-item disconnected">
               <div className="device-info">
                 <div className="device-name">{device.name}</div>
-                <div className="device-sub">{device.info}</div>
+                <div className="device-sub">{device.id}</div>
               </div>
               <Tag>offline</Tag>
             </div>

@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "desktop-react",
   "private": true,
   "version": "0.0.0",
@@ -15,6 +15,10 @@
     "@omni/playground": "workspace:*",
     "@omni/shared": "workspace:*",
     "@omni/visualizer": "workspace:*",
+    "@yume-chan/no-data-view": "^2.0.0",
+    "@yume-chan/scrcpy": "^2.3.0",
+    "@yume-chan/scrcpy-decoder-webcodecs": "^2.3.0",
+    "@yume-chan/stream-extra": "^2.1.0",
     "antd": "^5.21.6",
     "react": "18.3.1",
     "react-dom": "18.3.1",

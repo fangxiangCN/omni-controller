@@ -1,8 +1,8 @@
 ﻿import { defineConfig } from 'vite'
 import path from 'node:path'
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import react from '@vitejs/plugin-react'
-import electron from 'vite-plugin-electron/simple'
 
 const corePkgPath = path.resolve(__dirname, '../../packages/core/package.json')
 const corePkg = JSON.parse(readFileSync(corePkgPath, 'utf-8'))
@@ -35,9 +35,16 @@ const alias = {
   '@omni/web/': `${path.resolve(__dirname, '../../packages/web/src')}/`,
 }
 
+const require = createRequire(import.meta.url)
+const electronModule = require('vite-plugin-electron/simple')
+const electron = (electronModule as any).default ?? electronModule
+
 export default defineConfig({
   define,
   resolve: { alias },
+  server: {
+    host: '127.0.0.1',
+  },
   css: {
     preprocessorOptions: {
       less: {

@@ -335,29 +335,25 @@ const routes = [
 ```
 omni-controller/
 ├── apps/
-│   └── desktop/              # Electron 主应用
-│       ├── src/
-│       │   ├── main/         # Electron 主进程
-│       │   ├── renderer/     # 渲染进程 (React)
-│       │   │   ├── components/
-│       │   │   │   ├── layout/
-│       │   │   │   │   ├── AppLayout.tsx
-│       │   │   │   │   ├── DevicePanel.tsx
-│       │   │   │   │   ├── InspectorPanel.tsx
-│       │   │   │   │   └── StatusBar.tsx
-│       │   │   │   ├── views/
-│       │   │   │   │   ├── PlaygroundView.tsx
-│       │   │   │   │   ├── ReportView.tsx
-│       │   │   │   │   └── RecorderView.tsx
-│       │   │   │   └── shared/
-│       │   │   ├── hooks/
-│       │   │   ├── stores/
-│       │   │   ├── types/
-│       │   │   └── App.tsx
-│       │   └── preload/
+│   └── desktop-react/         # Electron 主应用
+│       ├── electron/          # Electron main/preload/IPC
+│       ├── src/               # 渲染进程 (React)
+│       │   ├── layout/
+│       │   │   ├── AppLayout.tsx
+│       │   │   ├── DevicePanel.tsx
+│       │   │   ├── InspectorPanel.tsx
+│       │   │   └── StatusBar.tsx
+│       │   ├── views/
+│       │   │   ├── PlaygroundView.tsx
+│       │   │   ├── ReportView.tsx
+│       │   │   └── RecorderView.tsx
+│       │   ├── components/
+│       │   ├── store/
+│       │   ├── types/
+│       │   └── App.tsx
 │       └── package.json
 ├── packages/
-│   └── ui/                   # 共享 UI 组件（可选）
+│   └── ui/                    # 共享 UI 组件（可选）
 └── package.json
 ```
 

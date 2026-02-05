@@ -21,7 +21,8 @@
 - 2026-02-02: 创建项目目录与 docs
 - 2026-02-04: Midscene Agent 适配接入与 IPC 桥接
 - 2026-02-04: Android 驱动收尾（scrcpy control + socket 顺序对齐 Aya）
-- 2026-02-04: 统一 Agent Loop 直连重构（DeviceManager + TaskScheduler）
+- 2026-02-04: 统一 Agent Loop 直连重构（DeviceManager + PlaygroundServer）
 - 2026-02-05: Android scrcpy scid 与 serialize 逻辑对齐 Aya
 - 2026-02-05: Desktop 迁移到 React（apps/desktop-react）
 - 2026-02-05: Midscene visualizer/playground/web 迁移到 packages/*
+- 2026-02-05: Desktop React 接入 DeviceManager + PlaygroundServer，Playground/StatusBar/Inspector 接线

@@ -117,9 +117,10 @@ export enum IpcChannels {
 
 ## 7. Agent Loop（当前实现）
 
-- 入口：`apps/desktop-react/electron/main.ts`（IPC 注册已打底）
-- Agent 逻辑：`packages/core`（对齐 Midscene Agent）
-- 待接入：TaskScheduler + DeviceManager + IPC 全链路（见 UI 文档与 Roadmap）
+- 入口：`apps/desktop-react/electron/main.ts`
+- Electron Main：`DeviceManager` 管理设备与帧流；`PlaygroundServer` 提供远程执行接口
+- Renderer：`UniversalPlayground` + `PlaygroundSDK(remote-execution)` 直连本地 PlaygroundServer
+- IPC 目前聚焦设备列表/选中/帧流与任务状态回传（`task:start`/`task:stop` 保留扩展）
 
 ---
 
@@ -133,6 +134,6 @@ export enum IpcChannels {
 
 ## 9. 下一步建议（优先级）
 
-1) Desktop 端：打通 IPC 与 TaskScheduler，完成一条完整链路（选设备 -> 任务执行 -> 日志/进度 -> 结果）
+1) Desktop 端：打通 IPC 与 PlaygroundServer，完成完整链路（选设备 -> 任务执行 -> 日志/进度 -> 结果）
 2) Report/Visualizer：对齐 Midscene 报告与回放逻辑（packages/visualizer/playground/web）
 3) Android 收尾：控制通道稳定性、异常重连、日志与错误回传细化

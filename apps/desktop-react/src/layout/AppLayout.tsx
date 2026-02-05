@@ -1,5 +1,7 @@
 ﻿import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import { useLayoutStore } from '../store/layout'
+import { useEffect } from 'react'
+import { useAppStore } from '../store/app'
 import { DevicePanel } from './DevicePanel'
 import { InspectorPanel } from './InspectorPanel'
 import { MainWorkspace } from './MainWorkspace'
@@ -8,6 +10,7 @@ import { TitleBar } from './TitleBar'
 import './AppLayout.less'
 
 export function AppLayout() {
+  const initIpc = useAppStore((state) => state.initIpc)
   const {
     devicePanelWidth,
     inspectorPanelWidth,
@@ -19,6 +22,10 @@ export function AppLayout() {
     setDevicePanelWidth,
     setInspectorPanelWidth,
   } = useLayoutStore()
+
+  useEffect(() => {
+    initIpc()
+  }, [initIpc])
 
   return (
     <div className="app-layout" data-theme={theme}>
