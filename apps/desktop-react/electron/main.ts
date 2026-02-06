@@ -3,7 +3,10 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { mkdirSync, readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs'
 import { PlaygroundServer } from '@omni/playground'
-import { createAgentFromEnv } from '@omni/core'
+import { createAgentFromEnv, Agent } from '@omni/core'
+import type { AgentLike } from '@omni/core'
+import type { AbstractInterface } from '@omni/core/device'
+import type { AgentWithDumpListener } from './task-scheduler'
 import {
   IPC_DEVICE_FRAME,
   IPC_DEVICE_LIST,
@@ -147,7 +150,7 @@ function registerTaskScheduler() {
     if (!deviceManager.getActiveDeviceId()) {
       throw new Error('No active device available')
     }
-    return createAgentFromEnv(deviceManager.getAdapter())
+    return createAgentFromEnv(deviceManager.getAdapter()) as unknown as AgentWithDumpListener
   })
 
   taskScheduler.on('log', (payload) => {
@@ -194,7 +197,7 @@ async function ensurePlaygroundServer() {
     if (!deviceManager.getActiveDeviceId()) {
       throw new Error('No active device available')
     }
-    return createAgentFromEnv(deviceManager.getAdapter())
+    return createAgentFromEnv(deviceManager.getAdapter()) as unknown as Agent<AbstractInterface>
   })
 
   playgroundServer.app.use((req, res, next) => {

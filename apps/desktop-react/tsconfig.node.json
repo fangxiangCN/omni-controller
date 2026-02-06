@@ -1,9 +1,28 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@omni/shared": ["../../packages/shared/src"],
+      "@omni/shared/*": ["../../packages/shared/src/*"],
+      "@omni/core": ["../../packages/core/src"],
+      "@omni/core/*": ["../../packages/core/src/*"],
+      "@omni/visualizer": ["../../packages/visualizer/src"],
+      "@omni/visualizer/*": ["../../packages/visualizer/src/*"],
+      "@omni/playground": ["../../packages/playground/src"],
+      "@omni/playground/*": ["../../packages/playground/src/*"],
+      "@omni/drivers-android": ["../../packages/drivers/android/src"],
+      "@omni/drivers-android/*": ["../../packages/drivers/android/src/*"],
+      "@omni/drivers-interface": ["../../packages/drivers/interface/src"],
+      "@omni/drivers-interface/*": ["../../packages/drivers/interface/src/*"],
+      "@omni/web": ["../../packages/web/src"],
+      "@omni/web/*": ["../../packages/web/src/*"],
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["vite.config.ts", "electron"]
 }

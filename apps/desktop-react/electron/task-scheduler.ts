@@ -9,7 +9,7 @@ type TaskSchedulerEvents = {
   report: (payload: { html: string | null; title: string }) => void
 }
 
-type AgentWithDumpListener = AgentLike & {
+export type AgentWithDumpListener = AgentLike & {
   addDumpUpdateListener?: (
     listener: (dump: string, executionDump?: ExecutionDump) => void,
   ) => () => void

@@ -15,6 +15,10 @@
       "@omni/visualizer/*": ["../../packages/visualizer/src/*"],
       "@omni/playground": ["../../packages/playground/src"],
       "@omni/playground/*": ["../../packages/playground/src/*"],
+      "@omni/drivers-android": ["../../packages/drivers/android/src"],
+      "@omni/drivers-android/*": ["../../packages/drivers/android/src/*"],
+      "@omni/drivers-interface": ["../../packages/drivers/interface/src"],
+      "@omni/drivers-interface/*": ["../../packages/drivers/interface/src/*"],
       "@omni/web": ["../../packages/web/src"],
       "@omni/web/*": ["../../packages/web/src/*"],
       "@/*": ["./src/*"]
@@ -29,6 +33,5 @@
     "noUnusedParameters": false,
     "useUnknownInCatchVariables": false
   },
-  "include": ["src", "electron"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "electron", "vite.config.ts"]
 }
