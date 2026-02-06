@@ -18,7 +18,8 @@
     "./node": "./src/node/index.ts",
     "./types": "./src/types/index.ts",
     "./zod-schema-utils": "./src/zod-schema-utils.ts",
-    "./us-keyboard-layout": "./src/us-keyboard-layout.ts"
+    "./us-keyboard-layout": "./src/us-keyboard-layout.ts",
+    "./baseDB": "./src/baseDB/index.ts"
   },
   "dependencies": {
     "@silvia-odwyer/photon": "0.3.3",

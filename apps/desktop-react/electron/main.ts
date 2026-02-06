@@ -2,11 +2,14 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { mkdirSync, readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs'
-import { PlaygroundServer } from '@omni/playground'
+import { PlaygroundServer, PlaygroundSDK } from '@omni/playground'
+import type { FormValue, ExecutionOptions } from '@omni/playground'
+import type { DeviceAction } from '@omni/core'
 import { createAgentFromEnv, Agent } from '@omni/core'
 import type { AgentLike } from '@omni/core'
 import type { AbstractInterface } from '@omni/core/device'
 import type { AgentWithDumpListener } from './task-scheduler'
+
 import {
   IPC_DEVICE_FRAME,
   IPC_DEVICE_LIST,
@@ -83,15 +86,15 @@ function saveReportIndex() {
   }
 }
 
-function sendToRenderer<T>(channel: string, payload: T) {
+function sendToRenderer(channel: string, ...args: unknown[]) {
   if (!win) return
-  win.webContents.send(channel, payload)
+  win.webContents.send(channel, ...args)
 }
 
 function createWindow() {
   const isMac = process.platform === 'darwin'
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    icon: path.join(process.env.VITE_PUBLIC || '', 'electron-vite.svg'),
     frame: false,
     titleBarStyle: isMac ? 'hiddenInset' : undefined,
     webPreferences: {
@@ -104,6 +107,9 @@ function createWindow() {
   } else {
     win.loadFile(path.join(RENDERER_DIST, 'index.html'))
   }
+
+  // 打开开发者工具以便调试
+  win.webContents.openDevTools()
 
   win.webContents.on('did-finish-load', () => {
     const payload: ReportListPayload = { reports: reportIndex }
@@ -219,7 +225,89 @@ async function ensurePlaygroundServer() {
   sendToRenderer(IPC_TASK_LOG, payload)
 }
 
+// PlaygroundSDK 实例（用于 IPC 转发）
+let playgroundSDK: PlaygroundSDK | null = null
+
+function initPlaygroundSDK() {
+  if (playgroundSDK) return
+  playgroundSDK = new PlaygroundSDK({
+    type: 'remote-execution',
+    serverUrl: `http://localhost:${PLAYGROUND_SERVER_PORT}`,
+  })
+
+  // 设置事件转发到渲染进程
+  playgroundSDK.onDumpUpdate((dump: string, executionDump?: any) => {
+    sendToRenderer('playground:dumpUpdate', dump, executionDump)
+  })
+  playgroundSDK.onProgressUpdate((tip: string) => {
+    sendToRenderer('playground:progressUpdate', tip)
+  })
+}
+
 function registerIpc() {
+  // PlaygroundSDK IPC 处理器
+  ipcMain.handle('playground:executeAction', async (_event, actionType: string, value: FormValue, options: ExecutionOptions) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.executeAction(actionType, value, options)
+  })
+  ipcMain.handle('playground:getActionSpace', async (_event, context?: unknown) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.getActionSpace(context)
+  })
+  ipcMain.handle('playground:validateParams', async (_event, value: FormValue, action: DeviceAction<unknown>) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.validateStructuredParams(value, action)
+  })
+  ipcMain.handle('playground:formatErrorMessage', async (_event, error: any) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.formatErrorMessage(error)
+  })
+  ipcMain.handle('playground:createDisplayContent', async (_event, value: FormValue, needsStructuredParams: boolean, action: DeviceAction<unknown>) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.createDisplayContent(value, needsStructuredParams, action)
+  })
+  ipcMain.handle('playground:checkStatus', async () => {
+    initPlaygroundSDK()
+    return playgroundSDK!.checkStatus()
+  })
+  ipcMain.handle('playground:overrideConfig', async (_event, aiConfig: any) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.overrideConfig(aiConfig)
+  })
+  ipcMain.handle('playground:getTaskProgress', async (_event, requestId: string) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.getTaskProgress(requestId)
+  })
+  ipcMain.handle('playground:cancelTask', async (_event, requestId: string) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.cancelTask(requestId)
+  })
+  ipcMain.handle('playground:cancelExecution', async (_event, requestId: string) => {
+    initPlaygroundSDK()
+    return playgroundSDK!.cancelExecution(requestId)
+  })
+  ipcMain.handle('playground:getCurrentExecutionData', async () => {
+    initPlaygroundSDK()
+    return playgroundSDK!.getCurrentExecutionData()
+  })
+  ipcMain.handle('playground:getScreenshot', async () => {
+    initPlaygroundSDK()
+    return playgroundSDK!.getScreenshot()
+  })
+  ipcMain.handle('playground:getInterfaceInfo', async () => {
+    initPlaygroundSDK()
+    return playgroundSDK!.getInterfaceInfo()
+  })
+  ipcMain.handle('playground:getServiceMode', async () => {
+    initPlaygroundSDK()
+    return playgroundSDK!.getServiceMode()
+  })
+  ipcMain.handle('playground:getId', async () => {
+    initPlaygroundSDK()
+    return playgroundSDK!.id
+  })
+
+  // 原有 IPC 处理器
   ipcMain.on(IPC_DEVICE_SELECT, async (_event, payload: { deviceId?: string }) => {
     if (!deviceManager) return
     await deviceManager.selectDevice(payload?.deviceId || '')

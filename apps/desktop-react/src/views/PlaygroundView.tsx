@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
-import { PlaygroundSDK } from '@omni/playground'
+// 使用 IPC wrapper 替代直接的 @omni/playground 导入
+// 这样可以确保渲染进程不直接依赖可能包含 Node.js 代码的 @omni/playground 包
+import { PlaygroundSDK } from '../ipc/playground-sdk'
 import { UniversalPlayground } from '@omni/visualizer'
 import { PLAYGROUND_SERVER_PORT } from '@omni/shared/constants'
 import { TaskComposer } from '../components/TaskComposer'
