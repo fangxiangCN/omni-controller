@@ -79,6 +79,10 @@ export class DeviceManager extends EventEmitter {
     }
     const info = await this.adapter.getDeviceInfo()
     this.activeDeviceId = info.id
+    this.devices = this.devices.map((device) =>
+      device.id === info.id ? { ...device, ...info } : device,
+    )
+    this.emit('deviceList', this.devices)
     await this.startStream()
     this.emit('log', { type: 'info', content: `Device connected: ${info.id}` })
   }

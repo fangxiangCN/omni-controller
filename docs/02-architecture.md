@@ -39,9 +39,11 @@
 - 写日志与帧, 更新 UI
 
 当前实现补充
-- main: 已接入 IPC（task:start / task:log / task:state / device:list / device:frame / device:select）
+- main: 已接入 IPC（task:start / task:log / task:state / report:update / device:list / device:frame / device:select）
 - Android: adbkit + scrcpy reverseTcp 已打通，H.264 通过 IPC 流入 renderer
-- renderer: React UI 框架已搭建，ScreenCanvas/Report/Playground 组件迁移中
+- renderer: React UI 框架已搭建，Task 输入/Timeline 与 Report 回放/历史接入中
+- reports: 主进程持久化 `reports/index.json` 与 `report-*.html`
+- shell: TitleBar 窗口控制与主题切换已接入
 
 约束
 - AI 输出仅 Midscene 模式

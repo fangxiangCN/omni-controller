@@ -15,6 +15,24 @@ const alias = {
   '@omni/shared/': `${path.resolve(__dirname, '../../packages/shared/src')}/`,
   '@omni/core': path.resolve(__dirname, '../../packages/core/src'),
   '@omni/core/': `${path.resolve(__dirname, '../../packages/core/src')}/`,
+  '@/utils': path.resolve(__dirname, '../../packages/visualizer/src/utils'),
+  '@': path.resolve(__dirname, '../../packages/core/src'),
+  '@omni/drivers-android': path.resolve(
+    __dirname,
+    '../../packages/drivers/android/src',
+  ),
+  '@omni/drivers-android/': `${path.resolve(
+    __dirname,
+    '../../packages/drivers/android/src',
+  )}/`,
+  '@omni/drivers-interface': path.resolve(
+    __dirname,
+    '../../packages/drivers/interface/src',
+  ),
+  '@omni/drivers-interface/': `${path.resolve(
+    __dirname,
+    '../../packages/drivers/interface/src',
+  )}/`,
   '@omni/visualizer': path.resolve(
     __dirname,
     '../../packages/visualizer/src',

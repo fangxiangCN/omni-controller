@@ -4,6 +4,7 @@ import { PushReadableStream } from '@yume-chan/stream-extra'
 import { IPC_DEVICE_FRAME, type DeviceFramePayload } from '@omni/shared'
 import { ipcOn } from '../ipc'
 import { AndroidStreamDecoder } from './android-stream-decoder'
+import { useAppStore } from '../store/app'
 import './ScreenCanvas.less'
 
 type ScreenCanvasProps = {
@@ -16,6 +17,9 @@ export function ScreenCanvas({ deviceId }: ScreenCanvasProps) {
   const h264Controller = useRef<ReadableStreamDefaultController<Uint8Array> | null>(null)
   const decoderStarted = useRef(false)
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
+  const lastThumbAtRef = useRef(0)
+  const setDeviceThumbnail = useAppStore((state) => state.setDeviceThumbnail)
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -47,6 +51,25 @@ export function ScreenCanvas({ deviceId }: ScreenCanvasProps) {
             .catch(() => {
               decoderStarted.current = false
             })
+          videoRef.current = decoderRef.current.element
+          const renderFrame = () => {
+            const canvas = canvasRef.current
+            const ctx = ctxRef.current
+            const video = videoRef.current
+            if (!canvas || !ctx || !video) return
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+              canvas.width = video.videoWidth
+              canvas.height = video.videoHeight
+              ctx.drawImage(video, 0, 0)
+              const now = Date.now()
+              if (now - lastThumbAtRef.current > 1000 && payload.deviceId) {
+                lastThumbAtRef.current = now
+                setDeviceThumbnail(payload.deviceId, canvas.toDataURL('image/jpeg', 0.6))
+              }
+            }
+            video.requestVideoFrameCallback(() => renderFrame())
+          }
+          videoRef.current?.requestVideoFrameCallback(() => renderFrame())
         }
         h264Controller.current?.enqueue(payload.data)
         return
@@ -65,6 +88,9 @@ export function ScreenCanvas({ deviceId }: ScreenCanvasProps) {
           canvas.height = img.height
           ctx.clearRect(0, 0, img.width, img.height)
           ctx.drawImage(img, 0, 0)
+          if (payload.deviceId) {
+            setDeviceThumbnail(payload.deviceId, canvas.toDataURL('image/jpeg', 0.6))
+          }
         }
         img.src = url
       }

@@ -101,10 +101,18 @@ export enum IpcChannels {
   START_TASK = 'task:start',
   STOP_TASK = 'task:stop',
   DEVICE_SELECT = 'device:select',
+  DEVICE_REFRESH = 'device:refresh',
+  DEVICE_DISCONNECT = 'device:disconnect',
   DEVICE_UPDATE = 'device:list',
   TASK_LOG = 'task:log',
   DEVICE_FRAME = 'device:frame',
   TASK_STATE = 'task:state',
+  REPORT_UPDATE = 'report:update',
+  REPORT_LIST = 'report:list',
+  REPORT_SELECT = 'report:select',
+  WINDOW_MINIMIZE = 'window:minimize',
+  WINDOW_TOGGLE_MAXIMIZE = 'window:toggle-maximize',
+  WINDOW_CLOSE = 'window:close',
 }
 ```
 
@@ -117,10 +125,16 @@ export enum IpcChannels {
 
 ## 7. Agent Loop（当前实现）
 
-- 入口：`apps/desktop-react/electron/main.ts`
-- Electron Main：`DeviceManager` 管理设备与帧流；`PlaygroundServer` 提供远程执行接口
-- Renderer：`UniversalPlayground` + `PlaygroundSDK(remote-execution)` 直连本地 PlaygroundServer
-- IPC 目前聚焦设备列表/选中/帧流与任务状态回传（`task:start`/`task:stop` 保留扩展）
+- 入口：`apps/desktop-react/electron/task-scheduler.ts`
+- Electron Main：
+  - `DeviceManager` 管理设备与帧流
+  - `TaskScheduler` 调用 `createAgentFromEnv(adapter)` 执行 `aiAct`
+  - `PlaygroundServer` 提供远程执行接口（Playground 模式）
+- Renderer：
+  - `UniversalPlayground` + `PlaygroundSDK(remote-execution)`
+  - 任务输入 -> IPC `task:start`
+  - 状态/日志/报告回传：`task:state` / `task:log` / `report:update`
+  - 报告列表：`report:list`，历史选择：`report:select`
 
 ---
 

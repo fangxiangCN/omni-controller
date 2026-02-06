@@ -4,6 +4,8 @@ export type DeviceInfo = {
   id: string
   name: string
   type: DeviceType
+  osVersion?: string
+  size?: DeviceSize
 }
 
 export type DeviceList = DeviceInfo[]

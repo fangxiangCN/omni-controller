@@ -156,7 +156,22 @@ export class AndroidAdapter implements IDeviceAdapter {
   }
 
   async getDeviceInfo(): Promise<DeviceInfo> {
-    return { id: this.deviceId || 'android-unknown', name: 'Android', type: 'android' }
+    const id = this.deviceId || 'android-unknown'
+    let name = 'Android'
+    let osVersion = ''
+    try {
+      name = (await this.adb.shell(id, 'getprop ro.product.model')).trim() || name
+      osVersion = (await this.adb.shell(id, 'getprop ro.build.version.release')).trim()
+    } catch {
+      // ignore adb metadata errors
+    }
+    let size: DeviceSize | undefined
+    try {
+      size = await this.size()
+    } catch {
+      // ignore size errors
+    }
+    return { id, name, type: 'android', osVersion, size }
   }
 
   private async ensureSize(): Promise<DeviceSize> {

@@ -39,7 +39,15 @@ export enum IpcChannels {
   TASK_LOG = 'task:log',
   DEVICE_FRAME = 'device:frame', // { deviceId, format, data }
   DEVICE_SELECT = 'device:select',
+  DEVICE_REFRESH = 'device:refresh',
+  DEVICE_DISCONNECT = 'device:disconnect',
   TASK_STATE = 'task:state',
+  REPORT_UPDATE = 'report:update',
+  REPORT_LIST = 'report:list',
+  REPORT_SELECT = 'report:select',
+  WINDOW_MINIMIZE = 'window:minimize',
+  WINDOW_TOGGLE_MAXIMIZE = 'window:toggle-maximize',
+  WINDOW_CLOSE = 'window:close',
 }
 ```
 

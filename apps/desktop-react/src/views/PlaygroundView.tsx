@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { PlaygroundSDK } from '@omni/playground'
 import { UniversalPlayground } from '@omni/visualizer'
 import { PLAYGROUND_SERVER_PORT } from '@omni/shared/constants'
+import { TaskComposer } from '../components/TaskComposer'
+import { TaskTimeline } from '../components/TaskTimeline'
 import './PlaygroundView.less'
 
 export function PlaygroundView() {
@@ -25,6 +27,8 @@ export function PlaygroundView() {
           />
         </div>
       </div>
+      <TaskComposer />
+      <TaskTimeline />
     </div>
   )
 }

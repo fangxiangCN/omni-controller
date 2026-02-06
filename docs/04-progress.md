@@ -26,3 +26,14 @@
 - 2026-02-05: Desktop 迁移到 React（apps/desktop-react）
 - 2026-02-05: Midscene visualizer/playground/web 迁移到 packages/*
 - 2026-02-05: Desktop React 接入 DeviceManager + PlaygroundServer，Playground/StatusBar/Inspector 接线
+- 2026-02-05: Desktop TaskScheduler + Report 回传打通（IPC 任务链路）
+- 2026-02-05: Report 持久化与历史选择（reports/index.json）
+- 2026-02-05: Timeline 增加日志筛选与搜索
+- 2026-02-05: Report 回放联动 Timeline + Inspector 设备信息增强
+- 2026-02-05: Timeline 点击高亮任务 + Inspector 显示设备 OS/分辨率
+- 2026-02-05: Timeline 任务详情面板（联动 activeTaskId）
+- 2026-02-05: TitleBar 窗口控制 + 主题切换 + 设备缩略图/快捷操作
+- 2026-02-05: TitleBar 最大化状态联动 + 设备面板折叠图标栏
+- 2026-02-05: H.264 预览/缩略图更新 + 设备操作图标化 + 双击标题栏最大化
+- 2026-02-05: Report 历史删除（同步 index.json）
+- 2026-02-05: 定义可测试版本最小验收步骤

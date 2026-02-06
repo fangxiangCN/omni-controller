@@ -287,5 +287,10 @@ export interface YamlConfigResult {
   resultType?: 'success' | 'failed' | 'partialFailed' | 'notExecuted';
 }
 
+export {
+  buildDetailedLocateParam,
+  buildDetailedLocateParamAndRestParams,
+} from './yaml/utils';
+
 
 

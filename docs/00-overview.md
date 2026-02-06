@@ -13,6 +13,7 @@
 - 05-interfaces.md: 关键接口与协议
 - 06-decisions.md: 重要设计决策与理由
  - 07-model-config.md: 模型配置与默认参数
+ - TEST_CHECKLIST.md: 可测试版本最小验收步骤
 
 关键约束:
 - AI 输出格式只支持 Midscene 模式

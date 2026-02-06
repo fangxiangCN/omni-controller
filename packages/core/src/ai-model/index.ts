@@ -46,6 +46,7 @@ export {
   type TMultimodalPrompt,
   type TUserPrompt,
   findAllLocatorField,
+  findAllLocatorField as findAllMidsceneLocatorField,
   dumpActionParam,
   parseActionParam,
 } from '../common';
