@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events'
-import type { DeviceFrame, DeviceInfo } from '@omni/shared'
+import type { DeviceFrame, DeviceInfo } from '@omni/shared-types'
 import { AndroidAdapter } from '@omni/drivers-android'
 
 export type DeviceManagerEvents = {

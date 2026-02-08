@@ -1,4 +1,4 @@
-﻿import type { UIContext } from '@omni/core';
+﻿import type { UIContext } from '@omni/core-types';
 import type { ContextProvider } from '../../../types';
 
 /**

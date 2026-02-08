@@ -1,7 +1,7 @@
 ﻿import { BorderOutlined, SendOutlined } from '@ant-design/icons';
 import './index.less';
 import { DownOutlined } from '@ant-design/icons';
-import type { z } from '@omni/core';
+import type { z } from '@omni/core-types';
 import { Button, Dropdown, Form, Input, Radio, Tooltip } from 'antd';
 import type { MenuProps } from 'antd';
 import React, {
@@ -30,7 +30,7 @@ import {
   actionNameForType,
   isRunButtonEnabled as calculateIsRunButtonEnabled,
   getPlaceholderForType,
-} from '../../utils/playground-utils';
+} from '../../utils/playground-client-utils';
 import { ConfigSelector } from '../config-selector';
 import {
   BooleanField,
@@ -41,7 +41,7 @@ import {
 } from '../form-field';
 import { HistorySelector } from '../history-selector';
 import './index.less';
-import type { DeviceAction } from '@omni/core';
+import type { DeviceAction } from '@omni/core-types';
 
 const { TextArea } = Input;
 

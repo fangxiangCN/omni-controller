@@ -11,7 +11,7 @@ import { useEnvConfig } from '../../store/store';
 import type { FormValue, UniversalPlaygroundProps } from '../../types';
 import { ContextPreview } from '../context-preview';
 import { EnvConfigReminder } from '../env-config-reminder';
-import { PlaygroundResultView } from '../playground-result';
+import { PlaygroundResultView } from '../playground-client-result';
 import './index.less';
 import PlaygroundIcon from '../../icons/avatar.svg';
 import { defaultMainButtons } from '../../utils/constants';

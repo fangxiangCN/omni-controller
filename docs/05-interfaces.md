@@ -22,7 +22,7 @@ export interface IDeviceAdapter {
   disconnect(): Promise<void>;
 
   // 流与输入
-  startStream(onFrame: (data: Uint8Array, format: 'h264'|'jpeg') => void): Promise<void>;
+  startStream(onFrame: (frame: DeviceFrame) => void): Promise<void>;
   tap(x: number, y: number): Promise<void>;
   type(text: string): Promise<void>;
   scroll(dx: number, dy: number): Promise<void>;
@@ -30,7 +30,7 @@ export interface IDeviceAdapter {
 }
 ```
 
-IPC Channels (建议)
+IPC Channels（与 @omni/ipc-contract 对齐）
 ```ts
 export enum IpcChannels {
   START_TASK = 'task:start',

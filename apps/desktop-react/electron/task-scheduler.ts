@@ -1,7 +1,6 @@
 import { EventEmitter } from 'node:events'
-import type { AgentLike } from '@omni/core'
-import type { ExecutionDump } from '@omni/core'
-import type { TaskLogPayload, TaskStatePayload } from '@omni/shared'
+import type { AgentLike, ExecutionDump } from '@omni/core-types'
+import type { TaskLogPayload, TaskStatePayload } from '@omni/ipc-contract'
 
 type TaskSchedulerEvents = {
   log: (payload: TaskLogPayload) => void

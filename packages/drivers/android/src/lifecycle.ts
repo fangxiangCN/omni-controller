@@ -1,4 +1,4 @@
-﻿import type { DeviceFrame } from '@omni/shared'
+﻿import type { DeviceFrame } from '@omni/shared-types'
 import { ScrcpyClient } from './scrcpy/scrcpy-client'
 
 export async function safeStop(scrcpy?: ScrcpyClient) {

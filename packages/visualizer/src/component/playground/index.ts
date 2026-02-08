@@ -1,6 +1,6 @@
 // Re-export playground components for internal use
 export { ContextPreview } from '../context-preview';
-export { PlaygroundResultView } from '../playground-result';
+export { PlaygroundResultView } from '../playground-client-result';
 export { PromptInput } from '../prompt-input';
 export { useServerValid } from '../../hooks/useServerValid';
 export { ServiceModeControl } from '../service-mode-control';

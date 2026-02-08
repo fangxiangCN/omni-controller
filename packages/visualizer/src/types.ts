@@ -1,4 +1,4 @@
-﻿import type { DeviceAction, UIContext } from '@omni/core';
+﻿import type { DeviceAction, UIContext } from '@omni/core-types';
 import type { ComponentType } from 'react';
 
 // Zod schema related types - compatible with actual zod types
@@ -227,8 +227,8 @@ import type {
   GroupedActionDump,
   IExecutionDump,
   WebUIContext,
-} from '@omni/core';
-import type { ExecutionOptions, PlaygroundAgent } from '@omni/playground';
+} from '@omni/core-types';
+import type { ExecutionOptions, PlaygroundAgent } from '@omni/playground-client';
 
 // result type
 export interface PlaygroundResult {

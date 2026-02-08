@@ -2,12 +2,9 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { mkdirSync, readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs'
-import { PlaygroundServer, PlaygroundSDK } from '@omni/playground'
-import type { FormValue, ExecutionOptions } from '@omni/playground'
-import type { DeviceAction } from '@omni/core'
-import { createAgentFromEnv, Agent } from '@omni/core'
-import type { AgentLike } from '@omni/core'
-import type { AbstractInterface } from '@omni/core/device'
+import { PlaygroundServer, PlaygroundSDK } from '@omni/playground-runtime'
+import { createAgentFromEnv, Agent } from '@omni/core-runtime'
+import type { AbstractInterface } from '@omni/core-runtime/device'
 import type { AgentWithDumpListener } from './task-scheduler'
 
 import {
@@ -34,8 +31,14 @@ import {
   type TaskStatePayload,
   type ReportPayload,
   type ReportListPayload,
-} from '@omni/shared'
-import { PLAYGROUND_SERVER_PORT } from '@omni/shared/constants'
+} from '@omni/ipc-contract'
+import { PLAYGROUND_SERVER_PORT } from '@omni/shared-types/constants'
+import {
+  registerDeviceTaskIpc,
+  registerPlaygroundIpc,
+  registerReportIpc,
+  registerWindowIpc,
+} from '@omni/ipc-main'
 import { DeviceManager } from './device-manager'
 import { TaskScheduler } from './task-scheduler'
 
@@ -234,138 +237,67 @@ function initPlaygroundSDK() {
     type: 'remote-execution',
     serverUrl: `http://localhost:${PLAYGROUND_SERVER_PORT}`,
   })
-
-  // 设置事件转发到渲染进程
-  playgroundSDK.onDumpUpdate((dump: string, executionDump?: any) => {
-    sendToRenderer('playground:dumpUpdate', dump, executionDump)
-  })
-  playgroundSDK.onProgressUpdate((tip: string) => {
-    sendToRenderer('playground:progressUpdate', tip)
-  })
 }
 
 function registerIpc() {
-  // PlaygroundSDK IPC 处理器
-  ipcMain.handle('playground:executeAction', async (_event, actionType: string, value: FormValue, options: ExecutionOptions) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.executeAction(actionType, value, options)
-  })
-  ipcMain.handle('playground:getActionSpace', async (_event, context?: unknown) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.getActionSpace(context)
-  })
-  ipcMain.handle('playground:validateParams', async (_event, value: FormValue, action: DeviceAction<unknown>) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.validateStructuredParams(value, action)
-  })
-  ipcMain.handle('playground:formatErrorMessage', async (_event, error: any) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.formatErrorMessage(error)
-  })
-  ipcMain.handle('playground:createDisplayContent', async (_event, value: FormValue, needsStructuredParams: boolean, action: DeviceAction<unknown>) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.createDisplayContent(value, needsStructuredParams, action)
-  })
-  ipcMain.handle('playground:checkStatus', async () => {
-    initPlaygroundSDK()
-    return playgroundSDK!.checkStatus()
-  })
-  ipcMain.handle('playground:overrideConfig', async (_event, aiConfig: any) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.overrideConfig(aiConfig)
-  })
-  ipcMain.handle('playground:getTaskProgress', async (_event, requestId: string) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.getTaskProgress(requestId)
-  })
-  ipcMain.handle('playground:cancelTask', async (_event, requestId: string) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.cancelTask(requestId)
-  })
-  ipcMain.handle('playground:cancelExecution', async (_event, requestId: string) => {
-    initPlaygroundSDK()
-    return playgroundSDK!.cancelExecution(requestId)
-  })
-  ipcMain.handle('playground:getCurrentExecutionData', async () => {
-    initPlaygroundSDK()
-    return playgroundSDK!.getCurrentExecutionData()
-  })
-  ipcMain.handle('playground:getScreenshot', async () => {
-    initPlaygroundSDK()
-    return playgroundSDK!.getScreenshot()
-  })
-  ipcMain.handle('playground:getInterfaceInfo', async () => {
-    initPlaygroundSDK()
-    return playgroundSDK!.getInterfaceInfo()
-  })
-  ipcMain.handle('playground:getServiceMode', async () => {
-    initPlaygroundSDK()
-    return playgroundSDK!.getServiceMode()
-  })
-  ipcMain.handle('playground:getId', async () => {
-    initPlaygroundSDK()
-    return playgroundSDK!.id
+  if (!deviceManager || !taskScheduler) return
+
+  registerPlaygroundIpc({
+    ipcMain,
+    getSdk: () => {
+      initPlaygroundSDK()
+      return playgroundSDK!
+    },
+    sendToRenderer,
   })
 
-  // 原有 IPC 处理器
-  ipcMain.on(IPC_DEVICE_SELECT, async (_event, payload: { deviceId?: string }) => {
-    if (!deviceManager) return
-    await deviceManager.selectDevice(payload?.deviceId || '')
+  registerDeviceTaskIpc({
+    ipcMain,
+    deviceManager,
+    taskScheduler,
   })
-  ipcMain.on(IPC_START_TASK, async (_event, payload: { instruction: string; deviceId: string }) => {
-    if (!taskScheduler) return
-    if (deviceManager && payload?.deviceId) {
-      await deviceManager.selectDevice(payload.deviceId)
-    }
-    await taskScheduler.run(payload?.instruction || '')
+
+  registerReportIpc({
+    ipcMain,
+    readReport: (id: string) => {
+      const target = reportIndex.find((item) => item.id === id)
+      if (!target) return null
+      const html = readFileSync(target.path, 'utf-8')
+      return {
+        html,
+        id: target.id,
+        title: target.title,
+        path: target.path,
+      } satisfies ReportPayload
+    },
+    deleteReport: (id: string) => {
+      const targetIndex = reportIndex.findIndex((item) => item.id === id)
+      if (targetIndex < 0) return null
+      const target = reportIndex[targetIndex]
+      try {
+        if (existsSync(target.path)) unlinkSync(target.path)
+      } catch {
+        // ignore delete errors
+      }
+      reportIndex.splice(targetIndex, 1)
+      saveReportIndex()
+      return { reports: reportIndex } satisfies ReportListPayload
+    },
+    sendToRenderer: (channel, payload) => sendToRenderer(channel, payload),
   })
-  ipcMain.on(IPC_STOP_TASK, () => {
-    taskScheduler?.stop()
-  })
-  ipcMain.on(IPC_DEVICE_REFRESH, async () => {
-    await deviceManager?.refreshDevices()
-  })
-  ipcMain.on(IPC_DEVICE_DISCONNECT, async () => {
-    await deviceManager?.disconnect()
-  })
-  ipcMain.on(IPC_REPORT_SELECT, (_event, payload: { id?: string }) => {
-    const target = reportIndex.find((item) => item.id === payload?.id)
-    if (!target) return
-    const html = readFileSync(target.path, 'utf-8')
-    const reportPayload: ReportPayload = {
-      html,
-      id: target.id,
-      title: target.title,
-      path: target.path,
-    }
-    sendToRenderer(IPC_REPORT_UPDATE, reportPayload)
-  })
-  ipcMain.on(IPC_REPORT_DELETE, (_event, payload: { id?: string }) => {
-    const targetIndex = reportIndex.findIndex((item) => item.id === payload?.id)
-    if (targetIndex < 0) return
-    const target = reportIndex[targetIndex]
-    try {
-      if (existsSync(target.path)) unlinkSync(target.path)
-    } catch {
-      // ignore delete errors
-    }
-    reportIndex.splice(targetIndex, 1)
-    saveReportIndex()
-    sendToRenderer(IPC_REPORT_LIST, { reports: reportIndex })
-    if (target.id === payload?.id) {
-      sendToRenderer(IPC_REPORT_UPDATE, { html: null, id: '', title: '', path: '' })
-    }
-  })
-  ipcMain.on(IPC_WINDOW_MINIMIZE, () => {
-    win?.minimize()
-  })
-  ipcMain.on(IPC_WINDOW_TOGGLE_MAXIMIZE, () => {
-    if (!win) return
-    if (win.isMaximized()) win.unmaximize()
-    else win.maximize()
-  })
-  ipcMain.on(IPC_WINDOW_CLOSE, () => {
-    win?.close()
+
+  registerWindowIpc({
+    ipcMain,
+    window: {
+      minimize: () => win?.minimize(),
+      toggleMaximize: () => {
+        if (!win) return
+        if (win.isMaximized()) win.unmaximize()
+        else win.maximize()
+      },
+      close: () => win?.close(),
+      isMaximized: () => win?.isMaximized() || false,
+    },
   })
 }
 

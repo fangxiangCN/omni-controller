@@ -13,9 +13,9 @@
 
 ## 0. 参考实现映射
 
-- Android: `references/aya`（Electron + adbkit + scrcpy + @yume-chan/scrcpy）
-- HarmonyOS: `references/echo`（Electron + hdckit + UiDriver）
-- AI Core / Web: `references/midscene`（源码已融入 packages/core、packages/shared、packages/visualizer、packages/playground、packages/web）
+- Android: `/Volumes/MoveSpeed/github/references/aya`（Electron + adbkit + scrcpy + @yume-chan/scrcpy）
+- HarmonyOS: `/Volumes/MoveSpeed/github/references/echo`（Electron + hdckit + UiDriver）
+- AI Core / Web: `/Volumes/MoveSpeed/github/references/midscene`（源码已融入 Runtime/Types/UI 包）
 
 ---
 
@@ -48,11 +48,17 @@ omni-controller/
       electron/            # main/preload/IPC
       src/                 # renderer (React + AntD + @omni/visualizer)
   packages/
-    core/                  # Midscene Agent 适配 + Midscene core 源码融合
-    shared/                # IPC 类型 + Midscene shared 最小集
-    visualizer/            # Midscene visualizer 迁移
-    playground/            # Midscene playground 迁移
-    web/                   # Midscene web-integration 迁移
+    core-runtime/          # Node-only Agent/TaskExecutor/Service/Report/YAML/Cache
+    core-types/            # 纯类型/Schema/纯函数
+    shared-runtime/        # env/logger/fs/img/Node-only 工具
+    shared-types/          # IPC payload/UI 共享类型
+    ipc-contract/          # IPC channel + payload types
+    ipc-main/              # main 端 IPC handler (Node-only)
+    ipc-client/            # renderer 端 IPC SDK
+    visualizer/            # UI-only (Midscene visualizer 迁移)
+    playground-runtime/    # Node-only playground server/bridge
+    playground-client/     # renderer/browser 侧 SDK
+    web-runtime/           # Node-only web-integration (Playwright/Bridge/MCP)
     drivers/
       interface/           # IDeviceAdapter 定义
       android/             # Android 驱动（adbkit + scrcpy）
@@ -94,7 +100,7 @@ omni-controller/
 
 ---
 
-## 6. IPC 规范（与 packages/shared 对齐）
+## 6. IPC 规范（与 @omni/ipc-contract 对齐）
 
 ```ts
 export enum IpcChannels {
@@ -130,11 +136,13 @@ export enum IpcChannels {
   - `DeviceManager` 管理设备与帧流
   - `TaskScheduler` 调用 `createAgentFromEnv(adapter)` 执行 `aiAct`
   - `PlaygroundServer` 提供远程执行接口（Playground 模式）
+  - `@omni/ipc-main` 统一注册 IPC handler
 - Renderer：
-  - `UniversalPlayground` + `PlaygroundSDK(remote-execution)`
+  - `UniversalPlayground` + `@omni/playground-client`
   - 任务输入 -> IPC `task:start`
   - 状态/日志/报告回传：`task:state` / `task:log` / `report:update`
   - 报告列表：`report:list`，历史选择：`report:select`
+  - 仅依赖 UI/Types/IPC Client，任何 Node 能力必须通过 IPC
 
 ---
 

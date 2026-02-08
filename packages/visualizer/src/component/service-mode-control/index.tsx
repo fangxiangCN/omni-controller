@@ -1,4 +1,4 @@
-﻿import { PlaygroundSDK } from '@omni/playground';
+﻿import { PlaygroundSDK } from '@omni/playground-client';
 import { Button, Tooltip, message } from 'antd';
 import type React from 'react';
 import { useEffect } from 'react';

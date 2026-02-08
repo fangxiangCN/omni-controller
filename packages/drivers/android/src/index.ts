@@ -1,4 +1,4 @@
-﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared'
+﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared-types'
 import type { IDeviceAdapter } from '@omni/drivers-interface'
 import {
   defineActionTap,
@@ -7,8 +7,8 @@ import {
   defineActionKeyboardPress,
   defineActionLongPress,
   defineActionSwipe,
-} from '@omni/core/device'
-import type { DeviceAction } from '@omni/core'
+} from '@omni/core-runtime/device'
+import type { DeviceAction } from '@omni/core-runtime'
 import { AdbClient } from './adb/adb-client'
 import { ScrcpyClient } from './scrcpy/scrcpy-client'
 import { safeStop } from './lifecycle'

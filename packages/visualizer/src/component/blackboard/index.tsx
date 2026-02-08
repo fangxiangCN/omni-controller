@@ -1,13 +1,13 @@
 ﻿'use client';
 import 'pixi.js/unsafe-eval';
-import type { BaseElement, Rect, UIContext } from '@omni/core';
+import type { BaseElement, Rect, UIContext } from '@omni/core-types';
 import { Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
 import * as PIXI from 'pixi.js';
 import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { colorForName, highlightColorForType } from '../../utils/color';
 import './index.less';
-import { treeToList } from '@omni/shared/extractor';
+import { treeToList } from '@omni/shared-types/extractor';
 import { DropShadowFilter, GlowFilter } from 'pixi-filters';
 import { useGlobalPreference } from '../../store/store';
 

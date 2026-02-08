@@ -4,7 +4,10 @@ import { readFileSync, statSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import react from '@vitejs/plugin-react'
 
-const corePkgPath = path.resolve(__dirname, '../../packages/core/package.json')
+const corePkgPath = path.resolve(
+  __dirname,
+  '../../packages/core-runtime/package.json',
+)
 const corePkg = JSON.parse(readFileSync(corePkgPath, 'utf-8'))
 const define = {
   __VERSION__: JSON.stringify(corePkg.version ?? '0.0.0'),
@@ -12,10 +15,38 @@ const define = {
 
 // 基础 alias（静态映射）
 const alias = {
-  '@omni/shared': path.resolve(__dirname, '../../packages/shared/src'),
-  '@omni/shared/': `${path.resolve(__dirname, '../../packages/shared/src')}/`,
-  '@omni/core': path.resolve(__dirname, '../../packages/core/src'),
-  '@omni/core/': `${path.resolve(__dirname, '../../packages/core/src')}/`,
+  '@omni/shared-runtime': path.resolve(
+    __dirname,
+    '../../packages/shared-runtime/src',
+  ),
+  '@omni/shared-runtime/': `${path.resolve(
+    __dirname,
+    '../../packages/shared-runtime/src',
+  )}/`,
+  '@omni/shared-types': path.resolve(
+    __dirname,
+    '../../packages/shared-types/src',
+  ),
+  '@omni/shared-types/': `${path.resolve(
+    __dirname,
+    '../../packages/shared-types/src',
+  )}/`,
+  '@omni/core-runtime': path.resolve(
+    __dirname,
+    '../../packages/core-runtime/src',
+  ),
+  '@omni/core-runtime/': `${path.resolve(
+    __dirname,
+    '../../packages/core-runtime/src',
+  )}/`,
+  '@omni/core-types': path.resolve(
+    __dirname,
+    '../../packages/core-types/src',
+  ),
+  '@omni/core-types/': `${path.resolve(
+    __dirname,
+    '../../packages/core-types/src',
+  )}/`,
   '@omni/drivers-android': path.resolve(
     __dirname,
     '../../packages/drivers/android/src',
@@ -40,18 +71,56 @@ const alias = {
     __dirname,
     '../../packages/visualizer/src',
   )}/`,
-  '@omni/playground': path.resolve(
+  '@omni/playground-runtime': path.resolve(
     __dirname,
-    '../../packages/playground/src',
+    '../../packages/playground-runtime/src',
   ),
-  '@omni/playground/': `${path.resolve(
+  '@omni/playground-runtime/': `${path.resolve(
     __dirname,
-    '../../packages/playground/src',
+    '../../packages/playground-runtime/src',
   )}/`,
-  '@omni/web': path.resolve(__dirname, '../../packages/web/src'),
-  '@omni/web/': `${path.resolve(__dirname, '../../packages/web/src')}/`,
+  '@omni/playground-client': path.resolve(
+    __dirname,
+    '../../packages/playground-client/src',
+  ),
+  '@omni/playground-client/': `${path.resolve(
+    __dirname,
+    '../../packages/playground-client/src',
+  )}/`,
+  '@omni/web-runtime': path.resolve(
+    __dirname,
+    '../../packages/web-runtime/src',
+  ),
+  '@omni/web-runtime/': `${path.resolve(
+    __dirname,
+    '../../packages/web-runtime/src',
+  )}/`,
+  '@omni/ipc-contract': path.resolve(
+    __dirname,
+    '../../packages/ipc-contract/src',
+  ),
+  '@omni/ipc-contract/': `${path.resolve(
+    __dirname,
+    '../../packages/ipc-contract/src',
+  )}/`,
+  '@omni/ipc-client': path.resolve(
+    __dirname,
+    '../../packages/ipc-client/src',
+  ),
+  '@omni/ipc-client/': `${path.resolve(
+    __dirname,
+    '../../packages/ipc-client/src',
+  )}/`,
+  '@omni/ipc-main': path.resolve(
+    __dirname,
+    '../../packages/ipc-main/src',
+  ),
+  '@omni/ipc-main/': `${path.resolve(
+    __dirname,
+    '../../packages/ipc-main/src',
+  )}/`,
   // 默认 @/ 映射到 core，但会在插件中根据来源覆盖
-  '@/': path.resolve(__dirname, '../../packages/core/src/'),
+  '@/': path.resolve(__dirname, '../../packages/core-runtime/src/'),
 }
 
 // 辅助函数：尝试解析文件路径
@@ -94,7 +163,7 @@ function resolveFilePath(basePath: string, importPath: string): string | null {
 
 // 创建路径解析插件
 function createPathResolverPlugin(): Plugin {
-  const coreSrc = path.resolve(__dirname, '../../packages/core/src')
+  const coreSrc = path.resolve(__dirname, '../../packages/core-runtime/src')
   const visualizerSrc = path.resolve(__dirname, '../../packages/visualizer/src')
   
   return {
@@ -116,7 +185,11 @@ function createPathResolverPlugin(): Plugin {
       const normalizedImporter = path.normalize(importer)
       
       let baseSrc: string
-      if (normalizedImporter.includes('packages' + path.sep + 'core' + path.sep + 'src')) {
+      if (
+        normalizedImporter.includes(
+          'packages' + path.sep + 'core-runtime' + path.sep + 'src',
+        )
+      ) {
         baseSrc = coreSrc
       } else if (normalizedImporter.includes('packages' + path.sep + 'visualizer' + path.sep + 'src')) {
         baseSrc = visualizerSrc

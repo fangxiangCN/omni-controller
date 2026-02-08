@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import net from 'node:net'
 import path from 'node:path'
-import type { DeviceFrame, DeviceSize } from '@omni/shared'
+import type { DeviceFrame, DeviceSize } from '@omni/shared-types'
 import type { AdbClient } from '../adb/adb-client'
 import {
   AndroidKeyCode,

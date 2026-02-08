@@ -1,6 +1,6 @@
 ﻿'use client';
 import { mousePointer } from '@/utils';
-import { paramStr, typeStr } from '@omni/core/agent';
+import { paramStr, typeStr } from '@omni/core-types/agent';
 
 import type {
   ExecutionDump,
@@ -12,7 +12,7 @@ import type {
   LocateResultElement,
   Rect,
   UIContext,
-} from '@omni/core';
+} from '@omni/core-types';
 
 // Local type definition for Planning Locate task
 interface ExecutionTaskPlanningLocate extends ExecutionTask {

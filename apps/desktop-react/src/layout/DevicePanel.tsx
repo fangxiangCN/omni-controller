@@ -10,7 +10,7 @@ import {
 import { Tooltip } from 'antd'
 import { useMemo } from 'react'
 import { useAppStore } from '../store/app'
-import type { DeviceInfo } from '@omni/shared'
+import type { DeviceInfo } from '@omni/shared-types'
 import './DevicePanel.less'
 
 type DevicePanelProps = {

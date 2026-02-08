@@ -4,20 +4,27 @@
 
 总体结构
 - apps/desktop-react: Electron 主应用 (main/renderer/preload)
-- packages/core: Midscene Agent 适配层
+- packages/core-runtime: Node-only Agent/TaskExecutor/Service/Report/YAML/Cache
+- packages/core-types: 纯类型/Schema/纯函数 (Renderer 可用)
+- packages/shared-runtime: env/logger/fs/img/Node-only 工具
+- packages/shared-types: IPC payload types/UI 共享类型
+- packages/ipc-contract: IPC channel + payload types
+- packages/ipc-main: main 端 IPC handler (Node-only)
+- packages/ipc-client: renderer 端 IPC SDK
+- packages/visualizer: UI-only (Midscene visualizer 迁移)
+- packages/playground-runtime: Node-only playground server/bridge
+- packages/playground-client: renderer/browser 侧 SDK
+- packages/web-runtime: Node-only web-integration (Playwright/Bridge/MCP)
 - packages/drivers: Android / HarmonyOS / Web 驱动
-- packages/shared: IPC 事件与通用类型
-- packages/visualizer: Midscene visualizer 迁移
-- packages/playground: Midscene playground 迁移
-- packages/web: Midscene web-integration 迁移
 - resources/bin: adb/hdc/uitest_agent 等二进制资源
 
 核心模块
 1) Core (Midscene)
-- 入口: Agent.aiAct(), aiLocate(), aiTap()/aiInput()/aiScroll()
+- 运行时入口: `@omni/core-runtime` (Agent.aiAct/aiLocate/aiTap/aiInput/aiScroll)
+- 类型入口: `@omni/core-types`
 - 依赖: TaskExecutor + Service
 - 特性: screenshot scale 处理, report dump, cache, replanning
-- 实现来源: references/midscene 源码融合到 packages/core 与 packages/shared（最小依赖集）
+- 实现来源: references/midscene (路径: /Volumes/MoveSpeed/github/references/midscene)
 
 2) Drivers
 - 统一设备抽象: IDeviceAdapter (见 05-interfaces.md)
@@ -31,6 +38,7 @@
 - Web: screenshot 或 DOM 展示
 - Timeline: 展示 Agent 执行日志
 - UI: React + Ant Design，报告与回放使用 @omni/visualizer
+- 约束: Renderer 仅依赖 UI/Types/IPC Client；任何 Node 能力必须通过 IPC
 
 统一 Agent Loop
 - 获取 UIContext

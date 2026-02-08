@@ -11,19 +11,5 @@
     "types": ["react", "node"],
     "declarationDir": "dist/types"
   },
-  "include": ["src", "builder"],
-  "references": [
-    {
-      "path": "../core"
-    },
-    {
-      "path": "../shared"
-    },
-    {
-      "path": "../web"
-    },
-    {
-      "path": "../playground"
-    }
-  ]
+  "include": ["src", "builder"]
 }

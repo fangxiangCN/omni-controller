@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { ScrcpyOptions3_1 } from '@yume-chan/scrcpy'
 import { PushReadableStream } from '@yume-chan/stream-extra'
-import { IPC_DEVICE_FRAME, type DeviceFramePayload } from '@omni/shared'
+import { IPC_DEVICE_FRAME, type DeviceFramePayload } from '@omni/ipc-contract'
 import { ipcOn } from '../ipc'
 import { AndroidStreamDecoder } from './android-stream-decoder'
 import { useAppStore } from '../store/app'

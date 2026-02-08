@@ -1,4 +1,4 @@
-﻿import { PlaygroundSDK } from '@omni/playground';
+﻿import { PlaygroundSDK } from '@omni/playground-client';
 import { useEffect, useState } from 'react';
 import { useEnvConfig } from '../store/store';
 

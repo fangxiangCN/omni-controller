@@ -1,9 +1,0 @@
-﻿{
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "..",
-    "noEmit": true
-  },
-  "include": ["src", "../shared/src", "../drivers/interface/src"]
-}

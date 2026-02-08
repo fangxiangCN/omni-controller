@@ -5,9 +5,10 @@
   "type": "module",
   "dependencies": {
     "@devicefarmer/adbkit": "^3.3.8",
-    "@omni/core": "workspace:*",
+    "@omni/core-runtime": "workspace:*",
     "@omni/drivers-interface": "workspace:*",
-    "@omni/shared": "workspace:*",
+    "@omni/shared-runtime": "workspace:*",
+    "@omni/shared-types": "workspace:*",
     "@yume-chan/no-data-view": "^2.0.0",
     "@yume-chan/scrcpy": "^2.3.0",
     "@yume-chan/stream-extra": "^2.1.0",

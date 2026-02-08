@@ -1,0 +1,31 @@
+﻿{
+  "name": "@omni/shared-runtime",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./env": "./src/env/index.ts",
+    "./img": "./src/img/index.ts",
+    "./logger": "./src/logger.ts",
+    "./common": "./src/common.ts",
+    "./node": "./src/node/index.ts",
+    "./mcp": "./src/mcp/index.ts"
+  },
+  "dependencies": {
+    "@omni/shared-types": "workspace:*",
+    "@modelcontextprotocol/sdk": "1.10.2",
+    "@silvia-odwyer/photon": "0.3.3",
+    "@silvia-odwyer/photon-node": "0.3.3",
+    "debug": "4.4.0",
+    "express": "^4.21.2",
+    "js-sha256": "0.11.0",
+    "langsmith": "^0.1.46",
+    "openai": "6.3.0",
+    "sharp": "^0.34.3",
+    "uuid": "11.1.0",
+    "zod": "3.24.3"
+  }
+}

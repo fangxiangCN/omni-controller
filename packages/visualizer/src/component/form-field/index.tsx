@@ -1,4 +1,4 @@
-﻿import type { z } from '@omni/core';
+import type { z } from '@omni/core-types';
 import { Form, Input, InputNumber, Select } from 'antd';
 import type React from 'react';
 import type { ZodRuntimeAccess } from '../../types';

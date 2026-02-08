@@ -2,7 +2,7 @@
   IndexedDBManager,
   createCleanupFunction,
   withErrorHandling,
-} from '@omni/shared/baseDB';
+} from '@omni/shared-types/baseDB';
 import type { InfoListItem, StorageProvider } from '../../../types';
 
 // Database configuration

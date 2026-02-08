@@ -3,8 +3,8 @@
   ExecutionDump,
   IExecutionDump,
   IGroupedActionDump,
-} from '@omni/core';
-import { paramStr, typeStr } from '@omni/core/agent';
+} from '@omni/core-types';
+import { paramStr, typeStr } from '@omni/core-types/agent';
 import { useCallback } from 'react';
 import { useEnvConfig } from '../store/store';
 import type {

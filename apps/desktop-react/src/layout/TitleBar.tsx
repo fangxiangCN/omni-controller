@@ -13,7 +13,7 @@ import {
   IPC_WINDOW_MINIMIZE,
   IPC_WINDOW_TOGGLE_MAXIMIZE,
   IPC_WINDOW_STATE,
-} from '@omni/shared'
+} from '@omni/ipc-contract'
 import { ipcOn, ipcSend } from '../ipc'
 import './TitleBar.less'
 

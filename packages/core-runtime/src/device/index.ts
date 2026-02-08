@@ -1,0 +1,466 @@
+﻿import { getLocationSchema } from '@/common';
+import type {
+  ActionScrollParam,
+  DeviceAction,
+  LocateResultElement,
+} from '@/types';
+import type { IModelConfig } from '@omni/shared-runtime/env';
+import type { ElementNode } from '@omni/shared-types/extractor';
+import { getDebug } from '@omni/shared-runtime/logger';
+import { _keyDefinitions } from '@omni/shared-types/us-keyboard-layout';
+import { z } from 'zod';
+import type { ElementCacheFeature, Rect, Size, UIContext } from '../types';
+
+export interface FileChooserHandler {
+  accept(files: string[]): Promise<void>;
+}
+
+export abstract class AbstractInterface {
+  abstract interfaceType: string;
+
+  abstract screenshotBase64(): Promise<string>;
+  abstract size(): Promise<Size>;
+  abstract actionSpace(): DeviceAction[];
+
+  cacheFeatureForPoint?(
+    center: [number, number],
+    options?: {
+      targetDescription?: string;
+      modelConfig?: IModelConfig;
+    },
+  ): Promise<ElementCacheFeature>;
+  rectMatchesCacheFeature?(
+    feature: ElementCacheFeature,
+  ): Promise<Rect>;
+
+  destroy?(): Promise<void>;
+
+  describe?(): string;
+  beforeInvokeAction?(actionName: string, param: any): Promise<void>;
+  afterInvokeAction?(actionName: string, param: any): Promise<void>;
+
+  // for web only
+  registerFileChooserListener?(
+    handler: (chooser: FileChooserHandler) => Promise<void>,
+  ): Promise<{ dispose: () => void; getError: () => Error | undefined }>;
+
+  // @deprecated do NOT extend this method
+  getElementsNodeTree?: () => Promise<ElementNode>;
+
+  // @deprecated do NOT extend this method
+  url?: () => string | Promise<string>;
+
+  // @deprecated do NOT extend this method
+  evaluateJavaScript?<T = any>(script: string): Promise<T>;
+
+  // @deprecated do NOT extend this method
+  getContext?(): Promise<UIContext>;
+
+  /**
+   * Get the current time from the device.
+   * Returns the device's current timestamp in milliseconds.
+   * This is useful when the system time and device time are not synchronized.
+   */
+  getTimestamp?(): Promise<number>;
+}
+
+// Generic function to define actions with proper type inference
+// TRuntime allows specifying a different type for the runtime parameter (after location resolution)
+// TReturn allows specifying the return type of the action
+export const defineAction = <
+  TSchema extends z.ZodType | undefined = undefined,
+  TRuntime = TSchema extends z.ZodType ? z.infer<TSchema> : undefined,
+  TReturn = any,
+>(
+  config: {
+    name: string;
+    description: string;
+    interfaceAlias?: string;
+    paramSchema?: TSchema;
+    call: (param: TRuntime) => Promise<TReturn> | TReturn;
+  } & Partial<
+    Omit<
+      DeviceAction<TRuntime, TReturn>,
+      'name' | 'description' | 'interfaceAlias' | 'paramSchema' | 'call'
+    >
+  >,
+): DeviceAction<TRuntime, TReturn> => {
+  return config as any; // Type assertion needed because schema validation type differs from runtime type
+};
+
+// Tap
+export const actionTapParamSchema = z.object({
+  locate: getLocationSchema().describe('The element to be tapped'),
+});
+export type ActionTapParam = {
+  locate: LocateResultElement;
+};
+
+export const defineActionTap = (
+  call: (param: ActionTapParam) => Promise<void>,
+): DeviceAction<ActionTapParam> => {
+  return defineAction<typeof actionTapParamSchema, ActionTapParam>({
+    name: 'Tap',
+    description: 'Tap the element',
+    interfaceAlias: 'aiTap',
+    paramSchema: actionTapParamSchema,
+    call,
+  });
+};
+
+// RightClick
+export const actionRightClickParamSchema = z.object({
+  locate: getLocationSchema().describe(
+    'The element to be right clicked',
+  ),
+});
+export type ActionRightClickParam = {
+  locate: LocateResultElement;
+};
+
+export const defineActionRightClick = (
+  call: (param: ActionRightClickParam) => Promise<void>,
+): DeviceAction<ActionRightClickParam> => {
+  return defineAction<
+    typeof actionRightClickParamSchema,
+    ActionRightClickParam
+  >({
+    name: 'RightClick',
+    description: 'Right click the element',
+    interfaceAlias: 'aiRightClick',
+    paramSchema: actionRightClickParamSchema,
+    call,
+  });
+};
+
+// DoubleClick
+export const actionDoubleClickParamSchema = z.object({
+  locate: getLocationSchema().describe(
+    'The element to be double clicked',
+  ),
+});
+export type ActionDoubleClickParam = {
+  locate: LocateResultElement;
+};
+
+export const defineActionDoubleClick = (
+  call: (param: ActionDoubleClickParam) => Promise<void>,
+): DeviceAction<ActionDoubleClickParam> => {
+  return defineAction<
+    typeof actionDoubleClickParamSchema,
+    ActionDoubleClickParam
+  >({
+    name: 'DoubleClick',
+    description: 'Double click the element',
+    interfaceAlias: 'aiDoubleClick',
+    paramSchema: actionDoubleClickParamSchema,
+    call,
+  });
+};
+
+// Hover
+export const actionHoverParamSchema = z.object({
+  locate: getLocationSchema().describe('The element to be hovered'),
+});
+export type ActionHoverParam = {
+  locate: LocateResultElement;
+};
+
+export const defineActionHover = (
+  call: (param: ActionHoverParam) => Promise<void>,
+): DeviceAction<ActionHoverParam> => {
+  return defineAction<typeof actionHoverParamSchema, ActionHoverParam>({
+    name: 'Hover',
+    description: 'Move the mouse to the element',
+    interfaceAlias: 'aiHover',
+    paramSchema: actionHoverParamSchema,
+    call,
+  });
+};
+
+// Input
+const inputLocateDescription =
+  'the position of the placeholder or text content in the target input field. If there is no content, locate the center of the input field.';
+export const actionInputParamSchema = z.object({
+  value: z
+    .union([z.string(), z.number()])
+    .transform((val) => String(val))
+    .describe(
+      'The text to input. Provide the final content for replace/append modes, or an empty string when using clear mode to remove existing text.',
+    ),
+  locate: getLocationSchema()
+    .describe(inputLocateDescription)
+    .optional(),
+  mode: z.preprocess(
+    (val) => (val === 'append' ? 'typeOnly' : val),
+    z
+      .enum(['replace', 'clear', 'typeOnly'])
+      .default('replace')
+      .optional()
+      .describe(
+        'Input mode: "replace" (default) - clear the field and input the value; "typeOnly" - type the value directly without clearing the field first; "clear" - clear the field without inputting new text.',
+      ),
+  ),
+});
+export type ActionInputParam = {
+  value: string;
+  locate?: LocateResultElement;
+  mode?: 'replace' | 'clear' | 'typeOnly' | 'append';
+};
+
+export const defineActionInput = (
+  call: (param: ActionInputParam) => Promise<void>,
+): DeviceAction<ActionInputParam> => {
+  return defineAction<typeof actionInputParamSchema, ActionInputParam>({
+    name: 'Input',
+    description: 'Input the value into the element',
+    interfaceAlias: 'aiInput',
+    paramSchema: actionInputParamSchema,
+    call,
+  });
+};
+
+// KeyboardPress
+export const actionKeyboardPressParamSchema = z.object({
+  locate: getLocationSchema()
+    .describe('The element to be clicked before pressing the key')
+    .optional(),
+  keyName: z
+    .string()
+    .describe(
+      "The key to be pressed. Use '+' for key combinations, e.g., 'Control+A', 'Shift+Enter'",
+    ),
+});
+export type ActionKeyboardPressParam = {
+  locate?: LocateResultElement;
+  keyName: string;
+};
+
+export const defineActionKeyboardPress = (
+  call: (param: ActionKeyboardPressParam) => Promise<void>,
+): DeviceAction<ActionKeyboardPressParam> => {
+  return defineAction<
+    typeof actionKeyboardPressParamSchema,
+    ActionKeyboardPressParam
+  >({
+    name: 'KeyboardPress',
+    description:
+      'Press a key or key combination, like "Enter", "Tab", "Escape", or "Control+A", "Shift+Enter". Do not use this to type text.',
+    interfaceAlias: 'aiKeyboardPress',
+    paramSchema: actionKeyboardPressParamSchema,
+    call,
+  });
+};
+
+// Scroll
+export const actionScrollParamSchema = z.object({
+  scrollType: z
+    .enum([
+      'singleAction',
+      'scrollToBottom',
+      'scrollToTop',
+      'scrollToRight',
+      'scrollToLeft',
+    ])
+    .default('singleAction')
+    .describe(
+      'The scroll behavior: "singleAction" for a single scroll action, "scrollToBottom" for scrolling all the way to the bottom by rapidly scrolling 5-10 times (skipping intermediate content until reaching the bottom), "scrollToTop" for scrolling all the way to the top by rapidly scrolling 5-10 times (skipping intermediate content until reaching the top), "scrollToRight" for scrolling all the way to the right by rapidly scrolling multiple times, "scrollToLeft" for scrolling all the way to the left by rapidly scrolling multiple times',
+    ),
+  direction: z
+    .enum(['down', 'up', 'right', 'left'])
+    .default('down')
+    .describe(
+      'The direction to scroll. Only effective when scrollType is "singleAction".',
+    ),
+  distance: z
+    .number()
+    .nullable()
+    .optional()
+    .describe('The distance in pixels to scroll'),
+  locate: getLocationSchema()
+    .optional()
+    .describe(
+      'Describe the target element to be scrolled on, like "the table" or "the list" or "the content area" or "the scrollable area". Do NOT provide a general intent like "scroll to find some element"',
+    ),
+});
+
+export const defineActionScroll = (
+  call: (param: ActionScrollParam) => Promise<void>,
+): DeviceAction<ActionScrollParam> => {
+  return defineAction<typeof actionScrollParamSchema, ActionScrollParam>({
+    name: 'Scroll',
+    description:
+      'Scroll the page or an element. The direction to scroll, the scroll type, and the distance to scroll. The distance is the number of pixels to scroll. If not specified, use `down` direction, `once` scroll type, and `null` distance.',
+    interfaceAlias: 'aiScroll',
+    paramSchema: actionScrollParamSchema,
+    call,
+  });
+};
+
+// DragAndDrop
+export const actionDragAndDropParamSchema = z.object({
+  from: getLocationSchema().describe('The position to be dragged'),
+  to: getLocationSchema().describe('The position to be dropped'),
+});
+export type ActionDragAndDropParam = {
+  from: LocateResultElement;
+  to: LocateResultElement;
+};
+
+export const defineActionDragAndDrop = (
+  call: (param: ActionDragAndDropParam) => Promise<void>,
+): DeviceAction<ActionDragAndDropParam> => {
+  return defineAction<
+    typeof actionDragAndDropParamSchema,
+    ActionDragAndDropParam
+  >({
+    name: 'DragAndDrop',
+    description:
+      'Drag and drop (hold the mouse or finger down and move the mouse) ',
+    interfaceAlias: 'aiDragAndDrop',
+    paramSchema: actionDragAndDropParamSchema,
+    call,
+  });
+};
+
+export const ActionLongPressParamSchema = z.object({
+  locate: getLocationSchema().describe(
+    'The element to be long pressed',
+  ),
+  duration: z
+    .number()
+    .default(500)
+    .optional()
+    .describe('Long press duration in milliseconds'),
+});
+
+export type ActionLongPressParam = {
+  locate: LocateResultElement;
+  duration?: number;
+};
+export const defineActionLongPress = (
+  call: (param: ActionLongPressParam) => Promise<void>,
+): DeviceAction<ActionLongPressParam> => {
+  return defineAction<typeof ActionLongPressParamSchema, ActionLongPressParam>({
+    name: 'LongPress',
+    description: 'Long press the element',
+    paramSchema: ActionLongPressParamSchema,
+    call,
+  });
+};
+
+export const ActionSwipeParamSchema = z.object({
+  start: getLocationSchema()
+    .optional()
+    .describe(
+      'Starting point of the swipe gesture, if not specified, the center of the page will be used',
+    ),
+  direction: z
+    .enum(['up', 'down', 'left', 'right'])
+    .optional()
+    .describe(
+      'The direction to swipe (required when using distance). The direction means the direction of the finger swipe.',
+    ),
+  distance: z
+    .number()
+    .optional()
+    .describe('The distance in pixels to swipe (mutually exclusive with end)'),
+  end: getLocationSchema()
+    .optional()
+    .describe(
+      'Ending point of the swipe gesture (mutually exclusive with distance)',
+    ),
+  duration: z
+    .number()
+    .default(300)
+    .describe('Duration of the swipe gesture in milliseconds'),
+  repeat: z
+    .number()
+    .optional()
+    .describe(
+      'The number of times to repeat the swipe gesture. 1 for default, 0 for infinite (e.g. endless swipe until the end of the page)',
+    ),
+});
+
+export type ActionSwipeParam = {
+  start?: LocateResultElement;
+  direction?: 'up' | 'down' | 'left' | 'right';
+  distance?: number;
+  end?: LocateResultElement;
+  duration?: number;
+  repeat?: number;
+};
+
+export const defineActionSwipe = (
+  call: (param: ActionSwipeParam) => Promise<void>,
+): DeviceAction<ActionSwipeParam> => {
+  return defineAction<typeof ActionSwipeParamSchema, ActionSwipeParam>({
+    name: 'Swipe',
+    description:
+      'Perform a swipe gesture. You must specify either "end" (target location) or "distance" + "direction" - they are mutually exclusive. Use "end" for precise location-based swipes, or "distance" + "direction" for relative movement.',
+    paramSchema: ActionSwipeParamSchema,
+    call,
+  });
+};
+
+// ClearInput
+export const actionClearInputParamSchema = z.object({
+  locate: getLocationSchema()
+    .describe('The input field to be cleared')
+    .optional(),
+});
+export type ActionClearInputParam = {
+  locate?: LocateResultElement;
+};
+
+export const defineActionClearInput = (
+  call: (param: ActionClearInputParam) => Promise<void>,
+): DeviceAction<ActionClearInputParam> => {
+  return defineAction<
+    typeof actionClearInputParamSchema,
+    ActionClearInputParam
+  >({
+    name: 'ClearInput',
+    description: inputLocateDescription,
+    interfaceAlias: 'aiClearInput',
+    paramSchema: actionClearInputParamSchema,
+    call,
+  });
+};
+// Sleep
+export const ActionSleepParamSchema = z.object({
+  timeMs: z
+    .number()
+    .default(1000)
+    .optional()
+    .describe('Sleep duration in milliseconds, defaults to 1000ms (1 second)'),
+});
+
+export type ActionSleepParam = {
+  timeMs?: number;
+};
+
+export const defineActionSleep = (): DeviceAction<ActionSleepParam> => {
+  return defineAction<typeof ActionSleepParamSchema, ActionSleepParam>({
+    name: 'Sleep',
+    description:
+      'Wait for a specified duration before continuing. Defaults to 1 second (1000ms) if not specified.',
+    paramSchema: ActionSleepParamSchema,
+    call: async (param) => {
+      const duration = param?.timeMs ?? 1000;
+      getDebug('device:common-action')(`Sleeping for ${duration}ms`);
+      await new Promise((resolve) => setTimeout(resolve, duration));
+    },
+  });
+};
+
+export type { DeviceAction } from '../types';
+export type {
+  AndroidDeviceOpt,
+  AndroidDeviceInputOpt,
+  IOSDeviceOpt,
+  IOSDeviceInputOpt,
+} from './device-options';
+
+
+

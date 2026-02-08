@@ -1,5 +1,4 @@
-﻿import type { WebUIContext } from '@omni/core';
-import { StaticPage, StaticPageAgent } from '@omni/web/static';
+﻿import type { WebUIContext } from '@omni/core-types';
 import type { ZodObjectSchema } from '../types';
 import { isZodObjectSchema, unwrapZodType } from '../types';
 
@@ -32,8 +31,8 @@ export const actionNameForType = (type: string) => {
 
 // Create static agent from context
 export const staticAgentFromContext = (context: WebUIContext) => {
-  const page = new StaticPage(context);
-  return new StaticPageAgent(page);
+  const _unused = context;
+  throw new Error('staticAgentFromContext is only available in Node runtime. Use IPC to request a server-side agent.');
 };
 
 // Get placeholder text based on run type

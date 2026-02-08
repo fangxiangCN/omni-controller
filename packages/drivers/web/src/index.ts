@@ -1,4 +1,4 @@
-﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared'
+﻿import type { DeviceFrame, DeviceInfo, DeviceSize } from '@omni/shared-types'
 import type { IDeviceAdapter } from '@omni/drivers-interface'
 
 // Reference: references/midscene/packages/web-integration

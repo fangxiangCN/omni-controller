@@ -1,4 +1,4 @@
-﻿import type { DeviceAction, UIContext } from '@omni/core';
+﻿import type { DeviceAction, UIContext } from '@omni/core-types';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   createStorageProvider,
