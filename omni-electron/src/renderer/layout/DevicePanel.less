@@ -1,0 +1,141 @@
+﻿.device-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--omni-bg-secondary);
+  border-right: 1px solid var(--omni-border-color);
+  padding: 12px;
+  gap: 8px;
+}
+
+.device-panel.collapsed {
+  padding: 12px 8px;
+  align-items: center;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--omni-text-secondary);
+}
+
+.panel-divider {
+  margin: 8px 0;
+}
+
+.group-title {
+  font-size: 11px;
+  color: var(--omni-text-tertiary);
+  margin: 8px 0 4px;
+}
+
+.device-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--omni-bg-tertiary);
+  border: 1px solid transparent;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.device-item.connected {
+  border-left: 3px solid var(--omni-success-color);
+}
+
+.device-item.disconnected {
+  border-left: 3px solid var(--omni-border-color);
+}
+
+.device-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.device-sub {
+  font-size: 11px;
+  color: var(--omni-text-secondary);
+}
+
+.device-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--omni-bg-primary);
+  border: 1px solid var(--omni-border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.device-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-placeholder {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--omni-text-secondary);
+}
+
+.device-actions {
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.device-item:hover .device-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  background: transparent;
+  border: 1px solid var(--omni-border-color);
+  color: var(--omni-text-secondary);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  color: var(--omni-text-primary);
+  border-color: var(--omni-text-secondary);
+}
+.disconnect-button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.collapsed-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.collapsed-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--omni-text-secondary);
+}
