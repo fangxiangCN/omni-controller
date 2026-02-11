@@ -2,16 +2,16 @@
 import type { Server } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExecutionDump } from '../core';
-import { GroupedActionDump } from '../core';
-import type { Agent as PageAgent } from '../core/agent';
-import { getTmpDir } from '../core/utils';
-import { PLAYGROUND_SERVER_PORT } from '../../types/constants';
+import type { ExecutionDump } from '@main/core';
+import { GroupedActionDump } from '@main/core';
+import type { Agent as PageAgent } from '@main/core/agent';
+import { getTmpDir } from '@main/core/utils';
+import { PLAYGROUND_SERVER_PORT } from '@types/constants';
 import {
   globalModelConfigManager,
   overrideAIConfig,
 } from '@shared/env';
-import { uuid } from '../../types/utils';
+import { uuid } from '@types/utils';
 import express, { type Request, type Response } from 'express';
 import { executeAction, formatErrorMessage } from './common';
 

@@ -1,5 +1,5 @@
 import { closeSync, openSync, readSync, statSync } from 'node:fs';
-import { antiEscapeScriptTag, escapeScriptTag } from '../../../types/utils';
+import { antiEscapeScriptTag, escapeScriptTag } from '@types/utils';
 
 export const escapeContent = escapeScriptTag;
 export const unescapeContent = antiEscapeScriptTag;

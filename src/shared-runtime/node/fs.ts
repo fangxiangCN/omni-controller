@@ -1,6 +1,6 @@
 ﻿import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { ifInBrowser, ifInWorker } from '../types/utils';
+import { ifInBrowser, ifInWorker } from '@types/utils';
 
 declare const __HTML_ELEMENT_SCRIPT__: string;
 

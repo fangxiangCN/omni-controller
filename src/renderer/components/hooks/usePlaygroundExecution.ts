@@ -1,10 +1,10 @@
-﻿import type {
+import type {
   DeviceAction,
   ExecutionDump,
   IExecutionDump,
   IGroupedActionDump,
 } from '../../types';
-import { paramStr, typeStr } from '../../types/agent';
+import { paramStr, typeStr } from '../../../main/core/agent/ui-utils';
 import { useCallback } from 'react';
 import { useEnvConfig } from '../store/store';
 import type {

@@ -1,7 +1,7 @@
 ﻿import assert from 'node:assert';
 import type { PhotonImage as PhotonImageType } from '@silvia-odwyer/photon-node';
-import { NodeType } from '../constants';
-import type { BaseElement, Rect } from '../types';
+import { NodeType } from '@types/constants';
+import type { BaseElement, Rect } from '@types';
 import getPhoton from './get-photon';
 import { photonFromBase64, photonToBase64 } from './transform';
 

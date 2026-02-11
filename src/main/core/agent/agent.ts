@@ -1,4 +1,4 @@
-﻿import type { TUserPrompt } from '../ai-model/index';
+import type { TUserPrompt } from '../ai-model/index';
 import { ScreenshotItem } from '../screenshot-item';
 import Service from '../service/index';
 // Import types and values directly from their source files to avoid circular dependency
@@ -39,13 +39,13 @@ export type TestStatus =
   | 'timedOut'
   | 'skipped'
   | 'interrupted';
-import { isAutoGLM, isUITars } from './ai-model/auto-glm/util';
+import { isAutoGLM, isUITars } from '../ai-model/auto-glm/util';
 import yaml from 'js-yaml';
 
-import { getVersion, processCacheConfig, reportHTMLContent } from './utils';
+import { getVersion, processCacheConfig, reportHTMLContent } from '../utils';
 import { commonContextParser, getReportFileName, parsePrompt } from './utils';
-import type { IReportGenerator } from './report-generator';
-import { ReportGenerator } from './report-generator';
+import type { IReportGenerator } from '../report-generator';
+import { ReportGenerator } from '../report-generator';
 import {
   ScriptPlayer,
   buildDetailedLocateParam,
@@ -54,8 +54,8 @@ import {
 
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import type { AbstractInterface } from './device';
-import type { TaskRunner } from './task-runner';
+import type { AbstractInterface } from '../device';
+import type { TaskRunner } from '../task-runner';
 import {
   type IModelConfig,
   OMNI_REPLANNING_CYCLE_LIMIT,
@@ -65,7 +65,7 @@ import {
 } from '@shared/env';
 import { imageInfoOfBase64, resizeImgBase64 } from '@shared/img';
 import { getDebug } from '@shared/logger';
-import { assert, ifInBrowser, uuid } from '../../../types/utils';
+import { assert, ifInBrowser, uuid } from '@types/utils';
 import { defineActionSleep } from '../device';
 import { TaskCache } from './task-cache';
 import {

@@ -1,7 +1,7 @@
 import { appendFileSync, existsSync, unlinkSync } from 'node:fs';
 import * as path from 'node:path';
 import { getRunSubDir } from '@shared/common';
-import { logMsg } from '../../../types/utils';
+import { logMsg } from '@types/utils';
 import { getReportFileName } from './agent';
 import {
   extractLastDumpScriptSync,

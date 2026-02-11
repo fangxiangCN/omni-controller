@@ -1,5 +1,5 @@
-﻿import type { DeviceAction, WebUIContext } from '../core';
-import type { Agent } from '../core/agent';
+﻿import type { DeviceAction, WebUIContext } from '@main/core';
+import type { Agent } from '@main/core/agent';
 
 export interface PlaygroundAgent extends Agent {
   [key: string]: any; // Allow dynamic method access for backward compatibility

@@ -1,7 +1,7 @@
-﻿import type { DeviceAction, ExecutionDump } from '../core';
-import { GroupedActionDump } from '../core';
+﻿import type { DeviceAction, ExecutionDump } from '@main/core';
+import { GroupedActionDump } from '@main/core';
 import { overrideAIConfig } from '@shared/env';
-import { uuid } from '../../types/utils';
+import { uuid } from '@types/utils';
 import { executeAction, parseStructuredParams } from '../common';
 import type {
   AgentFactory,

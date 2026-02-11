@@ -1,6 +1,6 @@
 ﻿import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
-import { assert, ifInBrowser, ifInWorker } from '../../../types/utils';
+import { assert, ifInBrowser, ifInWorker } from '@types/utils';
 import { type ZodTypeAny, z } from 'zod';
 
 // previous defined yaml flow, as a helper

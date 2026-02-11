@@ -2,7 +2,7 @@
   IndexedDBManager,
   createCleanupFunction,
   withErrorHandling,
-} from '../../types/baseDB';
+} from '@types/baseDB';
 import type { InfoListItem, StorageProvider } from '../../../types';
 
 // Database configuration

@@ -7,7 +7,7 @@ import * as PIXI from 'pixi.js';
 import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { colorForName, highlightColorForType } from '../../utils/color';
 import './index.less';
-import { treeToList } from '../../types/extractor';
+import { treeToList } from '@types/extractor';
 import { DropShadowFilter, GlowFilter } from 'pixi-filters';
 import { useGlobalPreference } from '../../store/store';
 

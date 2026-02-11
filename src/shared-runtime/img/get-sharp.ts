@@ -1,4 +1,4 @@
-﻿import { ifInNode } from '../types/utils';
+﻿import { ifInNode } from '@types/utils';
 type TSharpModule = typeof import('sharp');
 
 export default async function getSharp(): Promise<TSharpModule> {

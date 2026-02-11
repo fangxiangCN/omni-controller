@@ -1,5 +1,5 @@
 ﻿import { LoadingOutlined } from '@ant-design/icons';
-import { noReplayAPIs } from '../../main/playground';
+import { noReplayAPIs } from '@main/playground';
 import { Spin } from 'antd';
 import type React from 'react';
 import type { PlaygroundResult as PlaygroundResultType } from '../../types';

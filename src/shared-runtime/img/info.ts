@@ -1,5 +1,5 @@
 ﻿import assert from 'node:assert';
-import type { Size } from '../types';
+import type { Size } from '@types';
 import getPhoton from './get-photon';
 
 export interface ImageInfo extends Size {}

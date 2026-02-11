@@ -9,7 +9,7 @@
 import type { IModelConfig, TModelFamily } from '@shared/env';
 import { paddingToMatchBlockByBase64 } from '@shared/img';
 import { getDebug } from '@shared/logger';
-import { assert } from '../../../types/utils';
+import { assert } from '@types/utils';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import {
   buildYamlFlowFromPlans,

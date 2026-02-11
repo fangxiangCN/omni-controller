@@ -5,7 +5,7 @@ import path from 'node:path';
 // because it will cause circular dependency
 import { getBasicEnvValue } from './env/basic';
 import { MIDSCENE_RUN_DIR } from './env/types';
-import { ifInNode } from '../types/utils';
+import { ifInNode } from '@types/utils';
 
 export const defaultRunDirName = 'omni_run';
 // Define locally for now to avoid import issues

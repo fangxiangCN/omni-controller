@@ -24,7 +24,7 @@ import {
 } from './types';
 
 import { getDebug } from '../logger';
-import { assert } from '../types/utils';
+import { assert } from '@types/utils';
 import { maskConfig, parseJson } from './helper';
 import { initDebugConfig } from './init-debug';
 

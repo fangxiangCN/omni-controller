@@ -5,7 +5,7 @@ import type {
   YamlScript,
 } from './types';
 import { getDebug } from '@shared/logger';
-import { assert } from '../../../types/utils';
+import { assert } from '@types/utils';
 import yaml from 'js-yaml';
 
 const debugUtils = getDebug('yaml:utils');

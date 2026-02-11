@@ -1,4 +1,4 @@
-﻿import { PlaygroundSDK } from '../../main/playground';
+﻿import { PlaygroundSDK } from '@main/playground';
 import { useEffect, useState } from 'react';
 import { useEnvConfig } from '../store/store';
 

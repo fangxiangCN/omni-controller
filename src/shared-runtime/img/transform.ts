@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { PhotonImage as PhotonImageType } from '@silvia-odwyer/photon-node';
-import type { Rect } from '../types';
+import type { Rect } from '@types';
 import { getDebug } from '../logger';
-import { ifInNode } from '../types/utils';
+import { ifInNode } from '@types/utils';
 import getPhoton from './get-photon';
 import getSharp from './get-sharp';
 

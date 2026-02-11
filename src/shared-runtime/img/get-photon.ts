@@ -1,5 +1,5 @@
 ﻿import { getDebug } from '../logger';
-import { ifInBrowser, ifInNode, ifInWorker } from '../types/utils';
+import { ifInBrowser, ifInNode, ifInWorker } from '@types/utils';
 
 const debug = getDebug('img');
 

@@ -2,7 +2,7 @@ import type {
   StreamingAIResponse,
   StreamingCodeGenerationOptions,
 } from '../types';
-import { YAML_EXAMPLE_CODE } from '../../../types/constants';
+import { YAML_EXAMPLE_CODE } from '@types/constants';
 import type { IModelConfig } from '@shared/env';
 import {
   type ChatCompletionMessageParam,

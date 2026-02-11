@@ -1,22 +1,22 @@
-import type { TMultimodalPrompt, TUserPrompt } from './common';
-import type { AbstractInterface } from './device';
-import { ScreenshotItem } from '@/screenshot-item';
+import type { TMultimodalPrompt, TUserPrompt } from '../common';
+import type { AbstractInterface } from '../device';
+import { ScreenshotItem } from '../screenshot-item';
 import type {
   ElementCacheFeature,
   LocateResultElement,
   PlanningLocateParam,
   UIContext,
 } from '../types';
-import { uploadTestInfoToServer } from './utils';
+import { uploadTestInfoToServer } from '../utils';
 import {
   OMNI_REPORT_QUIET,
   OMNI_REPORT_TAG_NAME,
   globalConfigManager,
 } from '@shared/env';
-import { generateElementByRect } from '../../../types/extractor';
+import { generateElementByRect } from '@types/extractor';
 import { getDebug } from '@shared/logger';
-import { _keyDefinitions } from '../../../types/us-keyboard-layout';
-import { assert, logMsg, uuid } from '../../../types/utils';
+import { _keyDefinitions } from '@types/us-keyboard-layout';
+import { assert, logMsg, uuid } from '@types/utils';
 import dayjs from 'dayjs';
 import type { TaskCache } from './task-cache';
 import { debug as cacheDebug } from './task-cache';

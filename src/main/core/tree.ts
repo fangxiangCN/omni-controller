@@ -1,11 +1,11 @@
-﻿import type { BaseElement, ElementTreeNode } from '../../../types/types';
+﻿import type { BaseElement, ElementTreeNode } from '@types/types';
 
 import {
   descriptionOfTree as sharedDescriptionOfTree,
   treeToList,
   trimAttributes,
   truncateText,
-} from '../../../types/extractor';
+} from '@types/extractor';
 
 const ELEMENT_COUNT_WARNING_THRESHOLD = 5000;
 const TREE_SIZE_WARNING_MESSAGE =

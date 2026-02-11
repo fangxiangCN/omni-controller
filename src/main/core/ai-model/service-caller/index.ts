@@ -25,7 +25,7 @@ import {
 } from '@shared/env';
 
 import { getDebug } from '@shared/logger';
-import { assert, ifInBrowser } from '../../../types/utils';
+import { assert, ifInBrowser } from '@types/utils';
 import { jsonrepair } from 'jsonrepair';
 import OpenAI from 'openai';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';

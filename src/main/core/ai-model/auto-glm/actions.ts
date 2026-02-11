@@ -1,4 +1,4 @@
-﻿import { adaptBbox, pointToBbox } from './common';
+﻿import { adaptBbox, pointToBbox } from '../../common';
 import type { PlanningAction } from '../types';
 import { getDebug } from '@shared/logger';
 

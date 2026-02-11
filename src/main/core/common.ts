@@ -7,15 +7,15 @@ import type {
   Rect,
   Size,
 } from './types';
-import { assert, isPlainObject } from '../../../types/utils';
+import { assert, isPlainObject } from '@types/utils';
 
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 
 import { isUITars } from './ai-model/auto-glm/util';
 import type { PlanningLocateParam } from './types';
-import { NodeType } from '../../../types/constants';
+import { NodeType } from '@types/constants';
 import type { TModelFamily } from '@shared/env';
-import { treeToList } from '../../../types/extractor';
+import { treeToList } from '@types/extractor';
 import { compositeElementInfoImg } from '@shared/img';
 import { getDebug } from '@shared/logger';
 import { z } from 'zod';

@@ -26,7 +26,7 @@ export {
   safeOverrideAIConfig,
 } from './hooks/useSafeOverrideAIConfig';
 
-export { PlaygroundResultView } from './component/playground-client-result';
+export { PlaygroundResultView } from './component/playground-result';
 export type { PlaygroundResult } from './types';
 export { ServiceModeControl } from './component/service-mode-control';
 export { ContextPreview } from './component/context-preview';
@@ -40,7 +40,7 @@ export {
   actionNameForType,
   staticAgentFromContext,
   getPlaceholderForType,
-} from './utils/playground-client-utils';
+} from './utils/playground-utils';
 
 export { timeStr, filterBase64Value } from './utils';
 

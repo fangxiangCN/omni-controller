@@ -11,15 +11,15 @@ import type { IModelConfig } from '@shared/env';
 import {
   generateElementByPoint,
   generateElementByRect,
-} from '../../../types/extractor/dom-util';
+} from '@types/extractor/dom-util';
 import {
   cropByRect,
   paddingToMatchBlockByBase64,
   preProcessImageUrl,
 } from '@shared/img';
 import { getDebug } from '@shared/logger';
-import type { LocateResultElement } from '../../../types/types';
-import { assert } from '../../../types/utils';
+import type { LocateResultElement } from '@types/types';
+import { assert } from '@types/utils';
 import type {
   ChatCompletionSystemMessageParam,
   ChatCompletionUserMessageParam,

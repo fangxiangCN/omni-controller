@@ -1,4 +1,4 @@
-﻿export * from './omni-agent'
+export * from './omni-agent'
 export * from './omni-adapter-interface'
 export type { AgentLike, AiActOptions, LocateResult } from './omni-types'
 export type { DeviceAction } from './types'

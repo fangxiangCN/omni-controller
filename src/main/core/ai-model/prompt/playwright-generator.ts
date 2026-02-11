@@ -2,7 +2,7 @@ import type {
   StreamingAIResponse,
   StreamingCodeGenerationOptions,
 } from '../types';
-import { PLAYWRIGHT_EXAMPLE_CODE } from '../../../types/constants';
+import { PLAYWRIGHT_EXAMPLE_CODE } from '@types/constants';
 import type { IModelConfig } from '@shared/env';
 import type { ChatCompletionMessageParam } from 'openai/resources/index';
 import { callAI, callAIWithStringResponse } from '../index';

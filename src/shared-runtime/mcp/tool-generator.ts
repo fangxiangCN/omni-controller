@@ -1,6 +1,6 @@
 import { parseBase64 } from '../img';
 import { z } from 'zod';
-import { getZodDescription, getZodTypeName } from '../types/zod-schema-utils';
+import { getZodDescription, getZodTypeName } from '@types/zod-schema-utils';
 import type {
   ActionSpaceItem,
   BaseAgent,

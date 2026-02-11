@@ -7,8 +7,8 @@ import {
   defineActionKeyboardPress,
   defineActionLongPress,
   defineActionSwipe,
-} from '@omni/core-runtime/device'
-import type { DeviceAction } from '@omni/core-runtime'
+} from '@main/core/device'
+import type { DeviceAction } from '@main/core'
 import { AdbClient } from './adb/adb-client'
 import { ScrcpyClient } from './scrcpy/scrcpy-client'
 import { safeStop } from './lifecycle'

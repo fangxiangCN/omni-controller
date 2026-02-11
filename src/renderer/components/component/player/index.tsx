@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 import 'pixi.js/unsafe-eval';
 import * as PIXI from 'pixi.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './index.less';
-import { mouseLoading, mousePointer } from '@/utils';
+import { mouseLoading, mousePointer } from '../../utils';
 import {
   CaretRightOutlined,
   DownloadOutlined,

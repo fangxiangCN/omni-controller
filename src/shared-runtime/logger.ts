@@ -3,7 +3,7 @@ import path from 'node:path';
 import util from 'node:util';
 import debug from 'debug';
 import { getRunSubDir } from './common';
-import { ifInNode } from '../types/utils';
+import { ifInNode } from '@types/utils';
 
 const topicPrefix = 'midscene';
 // Map to store file streams

@@ -1,13 +1,13 @@
-import { isAutoGLM, isUITars } from './ai-model/auto-glm/util';
+import { isAutoGLM, isUITars } from '../ai-model/auto-glm/util';
 import {
   AIResponseParseError,
   AiExtractElementInfo,
   AiLocateElement,
   callAIWithObjectResponse,
-} from './ai-model/index';
-import { AiLocateSection } from './ai-model/inspect';
-import { elementDescriberInstruction } from './ai-model/prompt/describe';
-import { type AIArgs, expandSearchArea } from './common';
+} from '../ai-model/index';
+import { AiLocateSection } from '../ai-model/inspect';
+import { elementDescriberInstruction } from '../ai-model/prompt/describe';
+import { type AIArgs, expandSearchArea } from '../common';
 import type {
   AIDescribeElementResponse,
   AIUsageInfo,
@@ -20,8 +20,8 @@ import type {
   ServiceExtractResult,
   ServiceTaskInfo,
   UIContext,
-} from './types';
-import { ServiceError } from './types';
+} from '../types';
+import { ServiceError } from '../types';
 import {
   type IModelConfig,
   OMNI_FORCE_DEEP_THINK,
@@ -29,7 +29,7 @@ import {
 } from '@shared/env';
 import { compositeElementInfoImg, cropByRect } from '@shared/img';
 import { getDebug } from '@shared/logger';
-import { assert } from '../../../types/utils';
+import { assert } from '@types/utils';
 import type { TMultimodalPrompt } from '../common';
 import { createServiceDump } from './utils';
 

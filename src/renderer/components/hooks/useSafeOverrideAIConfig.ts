@@ -1,4 +1,4 @@
-import { PlaygroundSDK } from '../../main/playground'
+import { PlaygroundSDK } from '@main/playground'
 import { message } from 'antd'
 
 type AiConfigRecord = Record<string, string>

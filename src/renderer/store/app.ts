@@ -8,8 +8,8 @@ import {
   type DeviceListPayload,
   type TaskLogPayload,
   type TaskStatePayload,
-} from '@omni/shared'
-import { ipcOn, ipcSend } from '../ipc'
+} from '@main/ipc-contract'
+import { ipcOn, ipcSend } from '../ipc/client'
 
 type AppState = {
   devices: DeviceInfo[]

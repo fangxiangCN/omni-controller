@@ -228,7 +228,7 @@ import type {
   IExecutionDump,
   WebUIContext,
 } from '../../types';
-import type { ExecutionOptions, PlaygroundAgent } from '../../main/playground';
+import type { ExecutionOptions, PlaygroundAgent } from '@main/playground';
 
 // result type
 export interface PlaygroundResult {

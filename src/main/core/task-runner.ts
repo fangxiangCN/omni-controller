@@ -13,7 +13,7 @@ import {
   type UIContext,
 } from './types';
 import { getDebug } from '@shared/logger';
-import { assert, uuid } from '../../../types/utils';
+import { assert, uuid } from '@types/utils';
 
 const debug = getDebug('task-runner');
 const UI_CONTEXT_CACHE_TTL_MS = 300;

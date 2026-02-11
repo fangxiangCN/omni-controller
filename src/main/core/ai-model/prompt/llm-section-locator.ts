@@ -1,6 +1,6 @@
 ﻿import type { TModelFamily } from '@shared/env';
 import { getPreferredLanguage } from '@shared/env';
-import { bboxDescription } from './common';
+import { bboxDescription } from '../prompt/common';
 
 export function systemPromptToLocateSection(
   modelFamily: TModelFamily | undefined,

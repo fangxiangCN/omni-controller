@@ -1,6 +1,6 @@
 ﻿import { spawn } from 'node:child_process';
-import type { Agent, Agent as PageAgent } from '../core/agent';
-import { PLAYGROUND_SERVER_PORT } from '../../types/constants';
+import type { Agent, Agent as PageAgent } from '@main/core/agent';
+import { PLAYGROUND_SERVER_PORT } from '@types/constants';
 import cors from 'cors';
 import PlaygroundServer from './server';
 
@@ -83,7 +83,7 @@ export interface LaunchPlaygroundResult {
  * @example
  * ```typescript
  * import { playgroundForAgent } from '@omni/playground';
- * import { SampleDevice, Agent } from '../core';
+ * import { SampleDevice, Agent } from '@main/core';
  *
  * const device = new SampleDevice();
  * const agent = new Agent(device);

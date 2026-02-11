@@ -1,5 +1,5 @@
 import { Button, List, Popconfirm } from 'antd'
-import { Player } from './components'
+import { Player } from '../components'
 import { useAppStore } from '../store/app'
 import './ReportView.less'
 

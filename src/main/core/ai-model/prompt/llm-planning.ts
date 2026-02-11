@@ -4,9 +4,9 @@ import { getPreferredLanguage } from '@shared/env';
 import {
   getZodDescription,
   getZodTypeName,
-} from '../../../types/zod-schema-utils';
+} from '@types/zod-schema-utils';
 import type { z } from 'zod';
-import { bboxDescription } from './common';
+import { bboxDescription } from '../prompt/common';
 
 const vlLocateParam = (modelFamily: TModelFamily | undefined) => {
   if (modelFamily) {

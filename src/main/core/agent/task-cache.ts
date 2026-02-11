@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
-import type { TUserPrompt } from './ai-model';
+import type { TUserPrompt } from '../ai-model';
 import type { ElementCacheFeature } from '../types';
 import { getRunSubDir } from '@shared/common';
 import {
@@ -10,9 +10,9 @@ import {
   globalConfigManager,
 } from '@shared/env';
 import { getDebug } from '@shared/logger';
-import { ifInBrowser, ifInWorker } from '../../../types/utils';
-import { generateHashId } from '../../../types/utils';
-import { replaceIllegalPathCharsAndSpace } from '../../../types/utils';
+import { ifInBrowser, ifInWorker } from '@types/utils';
+import { generateHashId } from '@types/utils';
+import { replaceIllegalPathCharsAndSpace } from '@types/utils';
 import yaml from 'js-yaml';
 import semver from 'semver';
 import { getCoreVersion } from './utils';

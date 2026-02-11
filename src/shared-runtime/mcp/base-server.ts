@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { ParseArgsConfig } from 'node:util';
-import { setIsMcp } from '../types/utils';
+import { setIsMcp } from '@types/utils';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';

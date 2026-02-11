@@ -7,7 +7,7 @@ import {
 } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { getRunSubDir } from '@shared/common';
-import { ifInBrowser, logMsg } from '../../../types/utils';
+import { ifInBrowser, logMsg } from '@types/utils';
 import {
   generateDumpScriptTag,
   generateImageScriptTag,

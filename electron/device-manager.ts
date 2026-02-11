@@ -1,6 +1,6 @@
 import { EventEmitter } from 'node:events'
 import type { DeviceFrame, DeviceInfo } from '../src/types'
-import { AndroidAdapter } from '../src/main/drivers/android'
+import { AndroidAdapter } from '../src/main/drivers/android/src'
 
 export type DeviceManagerEvents = {
   deviceList: (devices: DeviceInfo[]) => void

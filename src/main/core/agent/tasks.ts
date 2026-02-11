@@ -4,17 +4,17 @@
   autoGLMPlanning,
   plan,
   uiTarsPlanning,
-} from './ai-model';
-import { isAutoGLM, isUITars } from './ai-model/auto-glm/util';
+} from '../ai-model';
+import { isAutoGLM, isUITars } from '../ai-model/auto-glm/util';
 import {
   type TMultimodalPrompt,
   type TUserPrompt,
   getReadableTimeString,
-} from './common';
-import type { AbstractInterface, FileChooserHandler } from './device';
-import type Service from './service';
-import type { TaskRunner } from './task-runner';
-import { TaskExecutionError } from './task-runner';
+} from '../common';
+import type { AbstractInterface, FileChooserHandler } from '../device';
+import type Service from '../service';
+import type { TaskRunner } from '../task-runner';
+import { TaskExecutionError } from '../task-runner';
 import type {
   DeepThinkOption,
   DeviceAction,
@@ -34,12 +34,12 @@ import type {
 import { ServiceError } from '../types';
 import { type IModelConfig, getCurrentTime } from '@shared/env';
 import { getDebug } from '@shared/logger';
-import { assert } from '../../../types/utils';
+import { assert } from '@types/utils';
 import { ExecutionSession } from './execution-session';
 import { TaskBuilder } from './task-builder';
 import type { TaskCache } from './task-cache';
 export { locatePlanForLocate } from './task-builder';
-import { descriptionOfTree } from '../../../types/extractor';
+import { descriptionOfTree } from '@types/extractor';
 import { taskTitleStr } from './ui-utils';
 import { parsePrompt } from './utils';
 

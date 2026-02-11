@@ -14,13 +14,13 @@ import {
   globalConfigManager,
 } from '@shared/env';
 import { getRunningPkgInfo } from '@shared/node';
-import { assert, logMsg } from '../../../types/utils';
+import { assert, logMsg } from '@types/utils';
 import {
   escapeScriptTag,
   ifInBrowser,
   ifInWorker,
   uuid,
-} from '../../../types/utils';
+} from '@types/utils';
 import type { Cache, Rect, ReportDumpWithAttributes } from './types';
 
 let logEnvReady = false;

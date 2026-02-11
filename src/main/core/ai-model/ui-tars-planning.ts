@@ -6,8 +6,8 @@
 } from '../types';
 import { type IModelConfig, UITarsModelVersion } from '@shared/env';
 import { getDebug } from '@shared/logger';
-import { transformHotkeyInput } from '../../../types/us-keyboard-layout';
-import { assert } from '../../../types/utils';
+import { transformHotkeyInput } from '@types/us-keyboard-layout';
+import { assert } from '@types/utils';
 import { actionParser } from '@ui-tars/action-parser';
 import type { ConversationHistory } from './conversation-history';
 import { getSummary, getUiTarsPlanningPrompt } from './prompt/ui-tars-planning';

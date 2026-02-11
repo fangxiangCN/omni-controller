@@ -1,13 +1,13 @@
-﻿import { getLocationSchema } from './common';
+﻿import { getLocationSchema } from '../common';
 import type {
   ActionScrollParam,
   DeviceAction,
   LocateResultElement,
-} from './types';
+} from '../types';
 import type { IModelConfig } from '@shared/env';
-import type { ElementNode } from '../../../types/extractor';
+import type { ElementNode } from '@types/extractor';
 import { getDebug } from '@shared/logger';
-import { _keyDefinitions } from '../../../types/us-keyboard-layout';
+import { _keyDefinitions } from '@types/us-keyboard-layout';
 import { z } from 'zod';
 import type { ElementCacheFeature, Rect, Size, UIContext } from '../types';
 

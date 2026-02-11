@@ -30,7 +30,7 @@ import {
   actionNameForType,
   isRunButtonEnabled as calculateIsRunButtonEnabled,
   getPlaceholderForType,
-} from '../../utils/playground-client-utils';
+} from '../../utils/playground-utils';
 import { ConfigSelector } from '../config-selector';
 import {
   BooleanField,

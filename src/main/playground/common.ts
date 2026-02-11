@@ -1,6 +1,6 @@
-﻿import type { DeviceAction } from '../core';
-import { findAllMidsceneLocatorField } from '../core/ai-model';
-import { buildDetailedLocateParam } from '../core/yaml';
+﻿import type { DeviceAction } from '@main/core';
+import { findAllMidsceneLocatorField } from '@main/core/ai-model';
+import { buildDetailedLocateParam } from '@main/core/yaml';
 import type {
   ExecutionOptions,
   FormValue,

@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 // 使用 IPC wrapper 替代直接的 @omni/playground 导入
 // 这样可以确保渲染进程不直接依赖可能包含 Node.js 代码的 @omni/playground 包
-import { PlaygroundSDK } from '../main/playground'
-import { UniversalPlayground } from './components'
-import { PLAYGROUND_SERVER_PORT } from '../types/constants'
+import { PlaygroundSDK } from '@main/playground'
+import { UniversalPlayground } from '../components'
+import { PLAYGROUND_SERVER_PORT } from '@types/constants'
 import { TaskComposer } from '../components/TaskComposer'
 import { TaskTimeline } from '../components/TaskTimeline'
 import './PlaygroundView.less'

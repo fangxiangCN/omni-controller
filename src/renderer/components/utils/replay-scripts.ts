@@ -1,6 +1,6 @@
-﻿'use client';
-import { mousePointer } from '@/utils';
-import { paramStr, typeStr } from '../../types/agent';
+'use client';
+import { mousePointer } from './index';
+import { paramStr, typeStr } from '../../../main/core/agent/ui-utils';
 
 import type {
   ExecutionDump,

@@ -1,4 +1,4 @@
-﻿import { assert } from '../types/utils';
+﻿import { assert } from '@types/utils';
 import type { IModelConfig } from './types';
 
 const maskKey = (key: string, maskChar = '*') => {

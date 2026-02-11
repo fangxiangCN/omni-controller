@@ -1,6 +1,6 @@
-﻿import { findAllLocatorField, parseActionParam } from './ai-model';
-import type { AbstractInterface } from './device';
-import type Service from './service';
+import { findAllLocatorField, parseActionParam } from '../ai-model';
+import type { AbstractInterface } from '../device';
+import type Service from '../service';
 import type {
   DetailedLocateParam,
   DeviceAction,
@@ -17,11 +17,11 @@ import type {
   ServiceDump,
 } from '../types';
 import { ServiceError } from '../types';
-import { sleep } from './utils';
+import { sleep } from '../utils';
 import type { IModelConfig } from '@shared/env';
-import { generateElementByRect } from '../../../types/extractor';
+import { generateElementByRect } from '@types/extractor';
 import { getDebug } from '@shared/logger';
-import { assert } from '../../../types/utils';
+import { assert } from '@types/utils';
 import type { TaskCache } from './task-cache';
 import {
   ifPlanLocateParamIsBbox,

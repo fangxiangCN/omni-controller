@@ -1,4 +1,4 @@
-import type { IpcChannels } from '../main/ipc-contract'
+import type { IpcChannels } from '@main/ipc-contract'
 
 export type IpcListener<T = any> = (payload: T) => void
 
@@ -28,6 +28,9 @@ export function off<T = any>(
 ): void {
   getOmniBridge().off(channel, listener as (...args: unknown[]) => void)
 }
+
+// Aliases for backward compatibility
+export { send as ipcSend, on as ipcOn }
 
 export function getPlaygroundBridge() {
   return getOmniBridge().playground
