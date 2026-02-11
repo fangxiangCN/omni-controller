@@ -1,4 +1,0 @@
-﻿declare module 'dirty-json';
-
-
-

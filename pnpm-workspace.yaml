@@ -1,4 +1,4 @@
-﻿packages:
-  - "apps/*"
-  - "packages/*"
-  - "packages/drivers/*"
+ignoredBuiltDependencies:
+  - electron
+  - esbuild
+  - less

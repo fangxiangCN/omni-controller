@@ -1,4 +1,0 @@
-﻿declare module 'js-yaml';
-
-
-
