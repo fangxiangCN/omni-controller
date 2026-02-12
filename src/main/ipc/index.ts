@@ -1,177 +1,360 @@
-import type {
-  DeviceFramePayload,
-  DeviceListPayload,
-  ReportListPayload,
-  ReportPayload,
-  TaskLogPayload,
-  TaskStatePayload,
-} from '../ipc-contract'
+import { ipcMain, BrowserWindow, app } from 'electron'
+import path from 'node:path'
+import deviceManager from '../core/device/manager'
+import taskScheduler from '../core/task/scheduler'
+import playgroundServer from '../playground/server'
+import { getAgentManager } from '../agent/manager'
+import type { AIModelConfig } from '../ai/service'
+import type { ModelConfig } from '../agent/strategies'
 import {
-  IPC_DEVICE_DISCONNECT,
   IPC_DEVICE_LIST,
-  IPC_DEVICE_REFRESH,
   IPC_DEVICE_SELECT,
-  IPC_REPORT_DELETE,
-  IPC_REPORT_LIST,
-  IPC_REPORT_SELECT,
-  IPC_REPORT_UPDATE,
+  IPC_DEVICE_REFRESH,
+  IPC_DEVICE_DISCONNECT,
+  IPC_DEVICE_FRAME,
+  IPC_DEVICE_SET_ADB_PATH,
+  IPC_DEVICE_GET_ADB_PATH,
   IPC_START_TASK,
   IPC_STOP_TASK,
   IPC_TASK_LOG,
   IPC_TASK_STATE,
-  IPC_WINDOW_CLOSE,
-  IPC_WINDOW_MINIMIZE,
-  IPC_WINDOW_TOGGLE_MAXIMIZE,
-} from '../ipc-contract'
+  IPC_REPORT_LIST,
+  IPC_REPORT_DELETE,
+  IPC_AGENT_INITIALIZE,
+  IPC_AGENT_START_TASK,
+  IPC_AGENT_STOP_TASK,
+  IPC_AGENT_LOG,
+  IPC_AGENT_PLANNING,
+  IPC_AGENT_ACTION_START,
+  IPC_AGENT_TASK_COMPLETE,
+  IPC_AGENT_GET_MODELS,
+  IPC_AGENT_SET_MODEL,
+  IPC_AGENT_GET_CURRENT_MODEL,
+  type DeviceListPayload,
+  type TaskLogPayload,
+  type TaskStatePayload,
+  type ReportListPayload,
+  type ReportPayload,
+  type AgentLogPayload,
+  type AgentPlanningPayload,
+  type AgentActionPayload,
+  type AgentTaskCompletePayload,
+  type ModelConfigPayload,
+} from './contract'
 
-export type PlaygroundSdkLike = {
-  executeAction: (actionType: string, value: unknown, options: unknown) => Promise<unknown>
-  getActionSpace: (context?: unknown) => Promise<unknown[]>
-  validateStructuredParams: (value: unknown, action: unknown) => Promise<{ valid: boolean; errorMessage?: string }>
-  formatErrorMessage: (error: any) => Promise<string>
-  createDisplayContent: (value: unknown, needsStructuredParams: boolean, action: unknown) => Promise<string>
-  checkStatus: () => Promise<boolean>
-  overrideConfig: (aiConfig: any) => Promise<void>
-  getTaskProgress: (requestId: string) => Promise<{ executionDump?: any }>
-  cancelTask: (requestId: string) => Promise<any>
-  cancelExecution: (requestId: string) => Promise<{ dump: any | null; reportHTML: string | null } | null>
-  getCurrentExecutionData: () => Promise<{ dump: any | null; reportHTML: string | null }>
-  getScreenshot: () => Promise<{ screenshot: string; timestamp: number } | null>
-  getInterfaceInfo: () => Promise<{ type: string; description?: string } | null>
-  getServiceMode: () => Promise<'In-Browser-Extension' | 'Server'>
-  id?: string
-  onDumpUpdate: (callback: (dump: string, executionDump?: any) => void) => void
-  onProgressUpdate: (callback: (tip: string) => void) => void
+let mainWindow: BrowserWindow | null = null
+
+function sendToRenderer(channel: string, payload: unknown) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send(channel, payload)
+  }
 }
 
-export type DeviceManagerLike = {
-  selectDevice: (deviceId: string) => Promise<void>
-  refreshDevices: () => Promise<void>
-  disconnect: () => Promise<void>
+export function initializeIpc(window: BrowserWindow) {
+  mainWindow = window
+  
+  // Setup managers
+  deviceManager.setMainWindow(window)
+  taskScheduler.setDeviceManager(deviceManager)
+  playgroundServer.setDeviceManager(deviceManager)
+  playgroundServer.setMainWindow(window)
+  
+  // Set default ADB path (bundled adb.exe)
+  const isDev = !app.isPackaged
+  const bundledAdbPath = isDev 
+    ? path.join(process.cwd(), 'adb.exe')
+    : path.join(path.dirname(app.getPath('exe')), 'adb.exe')
+  if (process.platform === 'win32') {
+    deviceManager.setAdbPath(bundledAdbPath)
+    console.log('[ADB] Using bundled adb:', bundledAdbPath)
+  }
+  
+  // Setup event forwarding
+  setupDeviceManagerEvents()
+  setupTaskSchedulerEvents()
+  
+  // Setup IPC handlers
+  setupDeviceIpc()
+  setupTaskIpc()
+  setupReportIpc()
+  
+  // Initialize playground
+  playgroundServer.initialize()
+  
+  // Start device polling
+  deviceManager.startPolling(3000)
 }
 
-export type TaskSchedulerLike = {
-  run: (instruction: string) => Promise<void>
-  stop: () => void
-}
-
-export type WindowController = {
-  minimize: () => void
-  toggleMaximize: () => void
-  close: () => void
-  isMaximized: () => boolean
-}
-
-export type IpcMainLike = {
-  on: (channel: string, listener: (event: any, ...args: any[]) => void) => void
-  handle: (channel: string, listener: (event: any, ...args: any[]) => any) => void
-}
-
-export type RegisterPlaygroundIpcOptions = {
-  ipcMain: IpcMainLike
-  getSdk: () => PlaygroundSdkLike
-  sendToRenderer: (channel: string, ...args: unknown[]) => void
-}
-
-export function registerPlaygroundIpc({ ipcMain, getSdk, sendToRenderer }: RegisterPlaygroundIpcOptions) {
-  const init = () => getSdk()
-
-  ipcMain.handle('playground:executeAction', async (_event, actionType: string, value: unknown, options: unknown) => {
-    return init().executeAction(actionType, value, options)
-  })
-  ipcMain.handle('playground:getActionSpace', async (_event, context?: unknown) => {
-    return init().getActionSpace(context)
-  })
-  ipcMain.handle('playground:validateParams', async (_event, value: unknown, action: unknown) => {
-    return init().validateStructuredParams(value, action)
-  })
-  ipcMain.handle('playground:formatErrorMessage', async (_event, error: any) => {
-    return init().formatErrorMessage(error)
-  })
-  ipcMain.handle('playground:createDisplayContent', async (_event, value: unknown, needsStructuredParams: boolean, action: unknown) => {
-    return init().createDisplayContent(value, needsStructuredParams, action)
-  })
-  ipcMain.handle('playground:checkStatus', async () => init().checkStatus())
-  ipcMain.handle('playground:overrideConfig', async (_event, aiConfig: any) => init().overrideConfig(aiConfig))
-  ipcMain.handle('playground:getTaskProgress', async (_event, requestId: string) => init().getTaskProgress(requestId))
-  ipcMain.handle('playground:cancelTask', async (_event, requestId: string) => init().cancelTask(requestId))
-  ipcMain.handle('playground:cancelExecution', async (_event, requestId: string) => init().cancelExecution(requestId))
-  ipcMain.handle('playground:getCurrentExecutionData', async () => init().getCurrentExecutionData())
-  ipcMain.handle('playground:getScreenshot', async () => init().getScreenshot())
-  ipcMain.handle('playground:getInterfaceInfo', async () => init().getInterfaceInfo())
-  ipcMain.handle('playground:getServiceMode', async () => init().getServiceMode())
-  ipcMain.handle('playground:getId', async () => init().id)
-
-  init().onDumpUpdate((dump: string, executionDump?: any) => {
-    sendToRenderer('playground:dumpUpdate', dump, executionDump)
-  })
-  init().onProgressUpdate((tip: string) => {
-    sendToRenderer('playground:progressUpdate', tip)
-  })
-}
-
-export type RegisterDeviceTaskIpcOptions = {
-  ipcMain: IpcMainLike
-  deviceManager: DeviceManagerLike
-  taskScheduler: TaskSchedulerLike
-}
-
-export function registerDeviceTaskIpc({ ipcMain, deviceManager, taskScheduler }: RegisterDeviceTaskIpcOptions) {
-  ipcMain.on(IPC_DEVICE_SELECT, async (_event, payload: { deviceId?: string }) => {
-    await deviceManager.selectDevice(payload?.deviceId || '')
-  })
-  ipcMain.on(IPC_START_TASK, async (_event, payload: { instruction: string; deviceId: string }) => {
-    if (payload?.deviceId) {
-      await deviceManager.selectDevice(payload.deviceId)
+function setupDeviceManagerEvents() {
+  // Forward device list to renderer
+  deviceManager.on('deviceList', (devices) => {
+    const payload: DeviceListPayload = {
+      devices: devices.map(d => ({
+        id: d.id,
+        name: d.name,
+        type: d.type,
+        status: d.status,
+        resolution: d.resolution,
+        osVersion: d.osVersion,
+      })),
     }
-    await taskScheduler.run(payload?.instruction || '')
+    sendToRenderer(IPC_DEVICE_LIST, payload)
   })
-  ipcMain.on(IPC_STOP_TASK, () => {
-    taskScheduler.stop()
+  
+  // Forward device frames to renderer
+  deviceManager.on('frame', ({ deviceId, frame }) => {
+    sendToRenderer(IPC_DEVICE_FRAME, {
+      deviceId,
+      format: frame.format,
+      data: frame.data,
+    })
   })
+  
+  // Forward logs
+  deviceManager.on('log', (log) => {
+    sendToRenderer(IPC_TASK_LOG, {
+      type: log.type,
+      content: log.content,
+      timestamp: Date.now(),
+    } as TaskLogPayload)
+  })
+}
+
+function setupTaskSchedulerEvents() {
+  // Forward task logs
+  taskScheduler.on('log', (log) => {
+    sendToRenderer(IPC_TASK_LOG, {
+      type: log.type,
+      content: log.content,
+      timestamp: Date.now(),
+    } as TaskLogPayload)
+  })
+  
+  // Forward task state
+  taskScheduler.on('taskStarted', (task) => {
+    sendToRenderer(IPC_TASK_STATE, {
+      status: 'running',
+      taskId: task.id,
+    } as TaskStatePayload)
+  })
+  
+  taskScheduler.on('taskCompleted', (task) => {
+    sendToRenderer(IPC_TASK_STATE, {
+      status: task.status,
+      taskId: task.id,
+    } as TaskStatePayload)
+  })
+  
+  taskScheduler.on('taskFailed', (task) => {
+    sendToRenderer(IPC_TASK_STATE, {
+      status: 'failed',
+      taskId: task.id,
+    } as TaskStatePayload)
+  })
+}
+
+function setupDeviceIpc() {
+  // Select device
+  ipcMain.on(IPC_DEVICE_SELECT, async (_event, deviceId: string) => {
+    await deviceManager.selectDevice(deviceId)
+  })
+  
+  // Refresh devices
   ipcMain.on(IPC_DEVICE_REFRESH, async () => {
     await deviceManager.refreshDevices()
   })
-  ipcMain.on(IPC_DEVICE_DISCONNECT, async () => {
-    await deviceManager.disconnect()
+  
+  // Disconnect device
+  ipcMain.on(IPC_DEVICE_DISCONNECT, async (_event, deviceId: string) => {
+    await deviceManager.disconnect(deviceId)
+  })
+
+  // Set ADB path
+  ipcMain.handle(IPC_DEVICE_SET_ADB_PATH, async (_event, path: string) => {
+    try {
+      deviceManager.setAdbPath(path)
+      // Refresh devices after setting new ADB path
+      await deviceManager.refreshDevices()
+      return { success: true }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      return { success: false, error: errorMsg }
+    }
+  })
+
+  // Get ADB path
+  ipcMain.handle(IPC_DEVICE_GET_ADB_PATH, async () => {
+    return deviceManager.getAdbPath()
   })
 }
 
-export type RegisterWindowIpcOptions = {
-  ipcMain: IpcMainLike
-  window: WindowController
-}
-
-export function registerWindowIpc({ ipcMain, window }: RegisterWindowIpcOptions) {
-  ipcMain.on(IPC_WINDOW_MINIMIZE, () => window.minimize())
-  ipcMain.on(IPC_WINDOW_TOGGLE_MAXIMIZE, () => window.toggleMaximize())
-  ipcMain.on(IPC_WINDOW_CLOSE, () => window.close())
-}
-
-export type RegisterReportIpcOptions = {
-  ipcMain: IpcMainLike
-  readReport: (id: string) => ReportPayload | null
-  deleteReport: (id: string) => { reports: ReportListPayload } | null
-  sendToRenderer: (channel: string, payload: ReportPayload | ReportListPayload) => void
-}
-
-export function registerReportIpc({ ipcMain, readReport, deleteReport, sendToRenderer }: RegisterReportIpcOptions) {
-  ipcMain.on(IPC_REPORT_SELECT, (_event, payload: { id?: string }) => {
-    if (!payload?.id) return
-    const reportPayload = readReport(payload.id)
-    if (!reportPayload) return
-    sendToRenderer(IPC_REPORT_UPDATE, reportPayload)
+function setupTaskIpc() {
+  // Start task
+  ipcMain.on(IPC_START_TASK, async (_event, prompt: string) => {
+    try {
+      await taskScheduler.startTask(prompt)
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      sendToRenderer(IPC_TASK_LOG, {
+        type: 'error',
+        content: `Failed to start task: ${errorMsg}`,
+        timestamp: Date.now(),
+      } as TaskLogPayload)
+    }
   })
-
-  ipcMain.on(IPC_REPORT_DELETE, (_event, payload: { id?: string }) => {
-    if (!payload?.id) return
-    const result = deleteReport(payload.id)
-    if (!result) return
-    sendToRenderer(IPC_REPORT_LIST, result.reports)
-    sendToRenderer(IPC_REPORT_UPDATE, { html: null, id: '', title: '', path: '' })
+  
+  // Stop task
+  ipcMain.on(IPC_STOP_TASK, async (_event, taskId: string) => {
+    taskScheduler.stopTask(taskId)
   })
 }
 
-export type RegisterDeviceEventForwardingOptions = {
-  sendToRenderer: (channel: string, payload: DeviceListPayload | DeviceFramePayload | TaskLogPayload | TaskStatePayload) => void
+function setupReportIpc() {
+  // Initial report list
+  const reports: ReportPayload[] = [
+    {
+      id: 'report-001',
+      title: 'App Navigation Test',
+      createdAt: Date.now() - 86400000,
+      path: '/reports/report-001.html',
+    },
+    {
+      id: 'report-002',
+      title: 'Login Flow Verification',
+      createdAt: Date.now() - 172800000,
+      path: '/reports/report-002.html',
+    },
+  ]
+  
+  // Send initial list
+  setTimeout(() => {
+    sendToRenderer(IPC_REPORT_LIST, { reports } as ReportListPayload)
+  }, 1000)
+  
+  // Delete report
+  ipcMain.on(IPC_REPORT_DELETE, async (_event, reportId: string) => {
+    console.log('Deleting report:', reportId)
+    // TODO: Implement actual deletion
+  })
+
+  // Setup Agent IPC
+  setupAgentIpc()
+}
+
+function setupAgentIpc() {
+  const agentManager = getAgentManager()
+
+  // Initialize agent
+  ipcMain.handle(IPC_AGENT_INITIALIZE, async (_event, config?: AIModelConfig) => {
+    try {
+      if (config) {
+        taskScheduler.setAIConfig(config)
+      }
+      await taskScheduler.initializeAgent()
+      return { success: true }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      return { success: false, error: errorMsg }
+    }
+  })
+
+  // Get available models
+  ipcMain.handle(IPC_AGENT_GET_MODELS, async () => {
+    const models = agentManager.getAvailableModels()
+    return models.map(m => ({
+      type: m.type,
+      name: m.name,
+      provider: m.provider,
+      baseUrl: m.baseUrl,
+      apiKey: m.apiKey,
+      model: m.model,
+      description: m.description,
+      capabilities: m.capabilities,
+    } as ModelConfigPayload))
+  })
+
+  // Set model
+  ipcMain.handle(IPC_AGENT_SET_MODEL, async (_event, config: ModelConfigPayload) => {
+    try {
+      const modelConfig: ModelConfig = {
+        type: config.type,
+        name: config.name,
+        provider: config.provider,
+        baseUrl: config.baseUrl,
+        apiKey: config.apiKey,
+        model: config.model,
+        description: config.description,
+        capabilities: config.capabilities,
+      }
+      agentManager.setModelConfig(modelConfig)
+      return { success: true }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      return { success: false, error: errorMsg }
+    }
+  })
+
+  // Get current model
+  ipcMain.handle(IPC_AGENT_GET_CURRENT_MODEL, async () => {
+    const config = agentManager.getModelConfig()
+    if (!config) return null
+    return {
+      type: config.type,
+      name: config.name,
+      provider: config.provider,
+      baseUrl: config.baseUrl,
+      apiKey: config.apiKey,
+      model: config.model,
+      description: config.description,
+      capabilities: config.capabilities,
+    } as ModelConfigPayload
+  })
+
+  // Start task with agent
+  ipcMain.on(IPC_AGENT_START_TASK, async (_event, prompt: string) => {
+    try {
+      await taskScheduler.startTask(prompt)
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      sendToRenderer(IPC_AGENT_LOG, {
+        type: 'error',
+        content: `Failed to start task: ${errorMsg}`,
+        timestamp: Date.now(),
+      } as AgentLogPayload)
+    }
+  })
+
+  // Stop task
+  ipcMain.on(IPC_AGENT_STOP_TASK, async (_event, taskId: string) => {
+    taskScheduler.stopTask(taskId)
+  })
+
+  // Forward agent events
+  taskScheduler.on('log', (log) => {
+    sendToRenderer(IPC_AGENT_LOG, {
+      type: log.type,
+      content: log.content,
+      timestamp: Date.now(),
+    } as AgentLogPayload)
+  })
+
+  taskScheduler.on('planning', (data) => {
+    sendToRenderer(IPC_AGENT_PLANNING, {
+      thought: data.thought,
+      actions: data.actions,
+    } as AgentPlanningPayload)
+  })
+
+  taskScheduler.on('action:start', (data) => {
+    sendToRenderer(IPC_AGENT_ACTION_START, {
+      action: data.action,
+    } as AgentActionPayload)
+  })
+
+  taskScheduler.on('taskCompleted', (task) => {
+    sendToRenderer(IPC_AGENT_TASK_COMPLETE, {
+      success: task.status === 'completed',
+      message: task.result?.message,
+    } as AgentTaskCompletePayload)
+  })
 }

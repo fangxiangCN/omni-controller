@@ -1,0 +1,16 @@
+.title-bar {
+  -webkit-app-region: drag;
+}
+
+.title-bar button {
+  -webkit-app-region: no-drag;
+  transition: all 0.2s;
+}
+
+.title-bar button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.title-bar button:last-child:hover {
+  background: #ff4d4f;
+}

@@ -1,0 +1,35 @@
+.app-layout {
+  user-select: none;
+}
+
+.app-layout .ant-layout-sider {
+  transition: all 0.3s;
+}
+
+.app-layout .ant-layout-sider-trigger {
+  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app-layout .ant-layout-sider-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Custom scrollbar */
+.app-layout ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.app-layout ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-layout ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.app-layout ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

@@ -1,0 +1,39 @@
+.recorder-view {
+  padding: 16px;
+  height: 100%;
+}
+
+.recorder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recorder-placeholder {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.recorder-placeholder .ant-card-body {
+  padding: 40px;
+}
+
+.recorder-placeholder .ant-empty-description {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.recorder-placeholder button:disabled {
+  opacity: 0.5;
+}
+
+.recorder-placeholder ul {
+  padding-left: 20px;
+}
+
+.recorder-placeholder li {
+  margin-bottom: 8px;
+}

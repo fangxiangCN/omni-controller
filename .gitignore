@@ -1,18 +1,19 @@
 # Dependencies
-node_modules
-.pnpm-store
+node_modules/
+.pnp
+.pnp.js
 
 # Build outputs
-dist
-dist-electron
+out/
+dist/
+dist-electron/
 
-# Environment
-.env
-.env.local
+# Electron
+resources/icon.png
 
 # IDE
-.vscode
-.idea
+.vscode/
+.idea/
 *.swp
 *.swo
 
@@ -21,13 +22,18 @@ dist-electron
 Thumbs.db
 
 # Logs
+logs/
 *.log
 npm-debug.log*
+pnpm-debug.log*
 
-# Test coverage
-coverage
+# Local env files
+.env.local
+.env.*.local
 
-# Temporary files
-*.tmp
-*.temp
+# Testing
+coverage/
 
+# Misc
+.lock-wscript
+.node_repl_history

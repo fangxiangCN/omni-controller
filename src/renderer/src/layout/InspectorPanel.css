@@ -1,0 +1,40 @@
+.inspector-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+}
+
+.inspector-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+}
+
+.inspector-card {
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.inspector-card .ant-card-head {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 40px;
+}
+
+.inspector-card .ant-card-body {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.inspector-card .ant-list-item {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.inspector-card .ant-list-item:last-child {
+  border-bottom: none;
+}

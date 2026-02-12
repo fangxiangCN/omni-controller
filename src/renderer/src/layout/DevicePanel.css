@@ -1,0 +1,57 @@
+.device-panel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.device-panel-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 8px;
+}
+
+.device-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.device-item {
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.device-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.device-item.active {
+  background: rgba(24, 144, 255, 0.15);
+  border-color: rgba(24, 144, 255, 0.3);
+}
+
+.device-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 20px;
+}
+
+.device-list .ant-list-item-meta-title {
+  margin-bottom: 4px;
+}
+
+.device-list .ant-list-item-meta-description {
+  color: rgba(255, 255, 255, 0.6);
+}

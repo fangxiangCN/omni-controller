@@ -1,0 +1,49 @@
+.main-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #0f0f1e;
+}
+
+.workspace-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-tabs .ant-tabs-nav {
+  margin-bottom: 0;
+  padding: 0 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.workspace-tabs .ant-tabs-tab {
+  color: rgba(255, 255, 255, 0.6);
+  padding: 12px 20px;
+  margin: 0 4px 0 0;
+}
+
+.workspace-tabs .ant-tabs-tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.workspace-tabs .ant-tabs-tab-active {
+  color: #1890ff !important;
+  background: rgba(24, 144, 255, 0.1);
+}
+
+.workspace-tabs .ant-tabs-ink-bar {
+  background: #1890ff;
+}
+
+.workspace-tabs .ant-tabs-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.workspace-tabs .ant-tabs-tabpane {
+  height: 100%;
+  overflow: auto;
+}

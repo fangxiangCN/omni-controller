@@ -1,0 +1,59 @@
+.report-view {
+  padding: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.report-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.report-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.report-card .ant-card-body {
+  padding: 16px;
+}
+
+.report-card .ant-card-actions {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.report-card .ant-card-actions > li {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.report-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.report-card .ant-card-meta-title {
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.report-card .ant-card-meta-description {
+  color: rgba(255, 255, 255, 0.6);
+}
