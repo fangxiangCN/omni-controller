@@ -15,7 +15,7 @@ import {
 import { Input, Typography, Space, Tag, Empty, Timeline, Button, Card, Alert, Modal, Form, Select, Divider } from 'antd'
 import { Device } from '../types'
 import { useAgent } from '../hooks/useAgent'
-import type { AgentLogPayload, ModelConfigPayload, ModelType } from '../types/ipc'
+import type { AgentLogPayload, ModelType } from '../types/ipc'
 import './PlaygroundView.css'
 
 const { TextArea } = Input

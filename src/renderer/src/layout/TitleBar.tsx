@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import { Layout, Button, Space, Tooltip } from 'antd'
+import { useState, useEffect } from 'react'
+import { Layout, Button, Space, Tooltip, Typography } from 'antd'
 import { 
   MinusOutlined, 
   BorderOutlined,
   FullscreenExitOutlined,
   CloseOutlined,
-  AppstoreOutlined
+  ControlOutlined
 } from '@ant-design/icons'
 import './TitleBar.css'
 
 const { Header } = Layout
+const { Text } = Typography
 
 // Extend window interface
 declare global {
@@ -46,52 +47,44 @@ function TitleBar(): JSX.Element {
   }
 
   return (
-    <Header className="title-bar" style={{ 
-      height: 40, 
-      padding: '0 16px',
-      background: '#1a1a2e',
-      borderBottom: '1px solid rgba(255,255,255,0.1)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      // @ts-ignore
-      WebkitAppRegion: "drag"
-    } as unknown as React.CSSProperties}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <AppstoreOutlined style={{ fontSize: 20, color: '#1890ff' }} />
-        <span style={{ 
-          color: '#fff', 
-          fontSize: 14, 
-          fontWeight: 600,
-          marginLeft: 8 
-        }}>
+    <Header className="title-bar">
+      <div className="title-bar-left">
+        <div className="title-bar-icon">
+          <ControlOutlined />
+        </div>
+        <Text className="title-bar-text">
           Omni Controller
-        </span>
+        </Text>
       </div>
 
-      <Space style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-        <Tooltip title="Minimize">
+      <Space className="title-bar-controls">
+        <Tooltip title="Minimize" mouseEnterDelay={0.5}>
           <Button
             type="text"
+            size="small"
             icon={<MinusOutlined />}
             onClick={handleMinimize}
-            style={{ color: '#fff' }}
+            className="title-bar-btn"
           />
         </Tooltip>
-        <Tooltip title={isMaximized ? 'Restore' : 'Maximize'}>
+        
+        <Tooltip title={isMaximized ? 'Restore' : 'Maximize'} mouseEnterDelay={0.5}>
           <Button
             type="text"
+            size="small"
             icon={isMaximized ? <FullscreenExitOutlined /> : <BorderOutlined />}
             onClick={handleMaximize}
-            style={{ color: '#fff' }}
+            className="title-bar-btn"
           />
         </Tooltip>
-        <Tooltip title="Close">
+        
+        <Tooltip title="Close" mouseEnterDelay={0.5}>
           <Button
             type="text"
+            size="small"
             icon={<CloseOutlined />}
             onClick={handleClose}
-            style={{ color: '#fff' }}
+            className="title-bar-btn title-bar-btn-close"
             danger
           />
         </Tooltip>

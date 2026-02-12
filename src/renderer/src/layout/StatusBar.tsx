@@ -2,8 +2,9 @@ import { Space, Badge, Typography } from 'antd'
 import { 
   DesktopOutlined, 
   CheckCircleOutlined, 
-  FileTextOutlined,
-  ApiOutlined
+  ApiOutlined,
+  MobileOutlined,
+  WifiOutlined,
 } from '@ant-design/icons'
 import { Device } from '../types'
 import './StatusBar.css'
@@ -17,40 +18,63 @@ interface StatusBarProps {
 }
 
 function StatusBar({ deviceCount, activeDevice, currentView }: StatusBarProps): JSX.Element {
+  const getStatusConfig = () => {
+    if (!activeDevice) return { icon: <WifiOutlined />, text: 'No device', color: 'default' }
+    
+    switch (activeDevice.status) {
+      case 'connected':
+        return { 
+          icon: <CheckCircleOutlined />, 
+          text: activeDevice.name,
+          color: 'success'
+        }
+      case 'busy':
+        return { 
+          icon: <DesktopOutlined />, 
+          text: activeDevice.name,
+          color: 'processing'
+        }
+      default:
+        return { 
+          icon: <MobileOutlined />, 
+          text: activeDevice.name,
+          color: 'error'
+        }
+    }
+  }
+
+  const status = getStatusConfig()
+
   return (
     <div className="status-bar">
-      <Space size="large">
-        <Space>
-          <DesktopOutlined />
-          <Text>{deviceCount} devices</Text>
+      <Space size="large" className="status-bar-left">
+        <Space size="small">
+          <DesktopOutlined className="status-icon" />
+          <Text className="status-text">
+            {deviceCount} device{deviceCount !== 1 ? 's' : ''}
+          </Text>
         </Space>
 
         {activeDevice && (
-          <Space>
+          <Space size="small" className="status-device"
+          >
             <Badge 
-              status={activeDevice.status === 'connected' ? 'success' : activeDevice.status === 'busy' ? 'processing' : 'error'} 
+              status={status.color as any}
+              className="status-badge"
             />
-            <Text>{activeDevice.name}</Text>
-            <Text type="secondary">({activeDevice.status})</Text>
+            <Text className="status-text">{status.text}</Text>
+            <Text className="status-subtext">({activeDevice.status})</Text>
           </Space>
         )}
 
-        <Space>
-          <ApiOutlined />
-          <Text>Mock API Mode</Text>
-          <Badge status="warning" text="Disconnected" />
-        </Space>
-
-        <Space>
-          <FileTextOutlined />
-          <Text>View: {currentView}</Text>
+        <Space size="small">
+          <ApiOutlined className="status-icon" />
+          <Text className="status-text">{currentView}</Text>
         </Space>
       </Space>
 
-      <Space>
-        <CheckCircleOutlined style={{ color: '#52c41a' }} />
-        <Text>Ready</Text>
-        <Text type="secondary">v1.0.0</Text>
+      <Space size="small" className="status-bar-right">
+        <Text className="status-version">v1.0.0</Text>
       </Space>
     </div>
   )

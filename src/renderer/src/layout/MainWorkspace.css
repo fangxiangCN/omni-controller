@@ -1,9 +1,11 @@
+/* MainWorkspace 样式 - 基于设计系统 */
+
 .main-workspace {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #0f0f1e;
+  background: var(--color-background);
 }
 
 .workspace-tabs {
@@ -12,38 +14,56 @@
   flex-direction: column;
 }
 
+/* Tabs Navigation */
 .workspace-tabs .ant-tabs-nav {
   margin-bottom: 0;
-  padding: 0 16px;
-  background: rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 var(--space-lg);
+  background: var(--color-background-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.workspace-tabs .ant-tabs-nav::before {
+  border-bottom: none !important;
 }
 
 .workspace-tabs .ant-tabs-tab {
-  color: rgba(255, 255, 255, 0.6);
-  padding: 12px 20px;
-  margin: 0 4px 0 0;
+  color: var(--color-text-secondary);
+  padding: var(--space-md) var(--space-lg);
+  margin: 0 var(--space-xs) 0 0 !important;
+  border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+  transition: all var(--transition-fast);
+  font-weight: 500;
 }
 
 .workspace-tabs .ant-tabs-tab:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .workspace-tabs .ant-tabs-tab-active {
-  color: #1890ff !important;
-  background: rgba(24, 144, 255, 0.1);
+  color: var(--color-primary) !important;
+  background: rgba(59, 130, 246, 0.1) !important;
 }
 
 .workspace-tabs .ant-tabs-ink-bar {
-  background: #1890ff;
+  background: var(--color-primary);
+  height: 2px;
 }
 
+/* Tabs Content */
 .workspace-tabs .ant-tabs-content {
   flex: 1;
   overflow: hidden;
+  background: var(--color-background);
 }
 
 .workspace-tabs .ant-tabs-tabpane {
   height: 100%;
   overflow: auto;
+}
+
+/* Tab Icons */
+.workspace-tabs .ant-tabs-tab .anticon {
+  margin-right: var(--space-sm);
+  font-size: 14px;
 }

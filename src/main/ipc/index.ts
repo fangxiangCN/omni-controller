@@ -1,6 +1,7 @@
 import { ipcMain, BrowserWindow, app } from 'electron'
 import path from 'node:path'
 import deviceManager from '../core/device/manager'
+import { findAdbPath } from '../utils/adb-resolver'
 import taskScheduler from '../core/task/scheduler'
 import playgroundServer from '../playground/server'
 import { getAgentManager } from '../agent/manager'
@@ -59,14 +60,15 @@ export function initializeIpc(window: BrowserWindow) {
   playgroundServer.setDeviceManager(deviceManager)
   playgroundServer.setMainWindow(window)
   
-  // Set default ADB path (bundled adb.exe)
-  const isDev = !app.isPackaged
-  const bundledAdbPath = isDev 
-    ? path.join(process.cwd(), 'adb.exe')
-    : path.join(path.dirname(app.getPath('exe')), 'adb.exe')
-  if (process.platform === 'win32') {
-    deviceManager.setAdbPath(bundledAdbPath)
-    console.log('[ADB] Using bundled adb:', bundledAdbPath)
+  // Find and set ADB path (platform-specific)
+  const adbPath = findAdbPath()
+  if (adbPath) {
+    deviceManager.setAdbPath(adbPath)
+    console.log('[ADB] Using adb:', adbPath)
+  } else {
+    console.warn('[ADB] No adb found. Please install Android SDK Platform Tools.')
+    console.warn('[ADB] macOS: brew install android-platform-tools')
+    console.warn('[ADB] Or download from: https://developer.android.com/studio/releases/platform-tools')
   }
   
   // Setup event forwarding

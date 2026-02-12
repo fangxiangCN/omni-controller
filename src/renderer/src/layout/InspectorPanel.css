@@ -1,40 +1,172 @@
+/* InspectorPanel 样式 - 基于设计系统 */
+
 .inspector-panel {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.2);
-  overflow-y: auto;
+  background: var(--color-background-secondary);
 }
 
 .inspector-header {
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 16px;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background-secondary);
 }
 
+.inspector-header h5 {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
+  font-weight: 600;
+}
+
+.inspector-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-lg);
+}
+
+/* Inspector Card */
 .inspector-card {
-  margin-bottom: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  background: var(--color-background-tertiary) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-lg) !important;
+  transition: all var(--transition-normal);
+  margin-bottom: var(--space-lg);
+}
+
+.inspector-card:hover {
+  border-color: var(--color-border-hover) !important;
 }
 
 .inspector-card .ant-card-head {
-  background: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  min-height: 40px;
+  background: transparent !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  padding: var(--space-md) var(--space-lg) !important;
+  min-height: 48px !important;
 }
 
 .inspector-card .ant-card-body {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.8);
+  padding: var(--space-lg) !important;
+  background: transparent !important;
 }
 
-.inspector-card .ant-list-item {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+.inspector-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
-.inspector-card .ant-list-item:last-child {
+.inspector-card-icon {
+  font-size: 16px;
+  color: var(--color-primary);
+}
+
+.inspector-card-icon.ai-icon {
+  color: var(--color-primary);
+}
+
+/* Inspector Descriptions */
+.inspector-descriptions .ant-descriptions-item-label {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inspector-descriptions .ant-descriptions-item-content {
+  color: var(--color-text-primary);
+}
+
+/* Inspector Alert */
+.inspector-alert {
+  background: rgba(59, 130, 246, 0.08) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.inspector-alert .ant-alert-message {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.inspector-alert .ant-alert-description {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.inspector-alert.ai-alert {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Divider */
+.inspector-divider {
+  border-color: var(--color-border) !important;
+  margin: var(--space-lg) 0 !important;
+}
+
+/* Example Tasks */
+.example-tasks {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-sm) 0 0 0;
+}
+
+.example-tasks li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-family: var(--font-family-code);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.example-tasks li:last-child {
   border-bottom: none;
+}
+
+.example-tasks li .anticon {
+  color: var(--color-primary);
+  font-size: 12px;
+}
+
+/* AI Capabilities */
+.ai-capabilities {
+  margin-top: var(--space-md);
+}
+
+.capability-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.capability-tags .ant-tag {
+  font-family: var(--font-family-code);
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+/* Scrollbar Styling */
+.inspector-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.inspector-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.inspector-content::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+.inspector-content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
 }

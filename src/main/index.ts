@@ -4,6 +4,7 @@ import { existsSync, mkdirSync } from 'fs'
 import { electronApp as toolkitElectronApp, optimizer, is } from '@electron-toolkit/utils'
 import { initializeIpc } from './ipc'
 import { execSync } from 'child_process'
+import { findAdbPath } from './utils/adb-resolver'
 
 // Fix GPU cache and permission issues
 app.commandLine.appendSwitch('disable-gpu-shader-disk-cache')
@@ -17,9 +18,12 @@ if (!existsSync(cachePath)) {
 app.setPath('cache', cachePath)
 
 // Test ADB before starting
-function testAdb(): boolean {
+function testAdb(adbPath: string | null): boolean {
+  if (!adbPath) {
+    console.error('[ADB Test] ADB path not provided')
+    return false
+  }
   try {
-    const adbPath = join(process.cwd(), 'adb.exe')
     console.log('[ADB Test] Testing ADB at:', adbPath)
     const result = execSync(`"${adbPath}" version`, { encoding: 'utf8', timeout: 5000 })
     console.log('[ADB Test] ADB version:', result.trim())
@@ -128,8 +132,12 @@ app.whenReady().then(() => {
   
   // Test ADB before starting
   console.log('[App] Testing ADB...')
-  const adbWorking = testAdb()
+  const adbPath = findAdbPath()
+  const adbWorking = testAdb(adbPath)
   console.log('[App] ADB working:', adbWorking)
+  if (!adbWorking) {
+    console.warn('[App] ADB not available. Device control features may not work.')
+  }
   
   // Set app user model id for windows
   toolkitElectronApp.setAppUserModelId('com.electron')
