@@ -15,12 +15,16 @@ export function useAgent() {
 
   let unsubscribers: (() => void)[] = []
 
-  async function fetchModels() {
+  async function fetchModels(retryCount = 3) {
     try {
       const models = await invoke('agent:get-models') as ModelConfigPayload[]
       agentStore.setModels(models)
     } catch (err) {
       console.error('Failed to fetch models:', err)
+      if (retryCount > 0) {
+        console.log(`[Agent] Retrying fetch models in 1s... (${retryCount} attempts left)`)
+        setTimeout(() => fetchModels(retryCount - 1), 1000)
+      }
     }
   }
 
@@ -98,8 +102,10 @@ export function useAgent() {
 
     unsubscribers = [unsubLog, unsubPlanning, unsubAction, unsubComplete]
 
-    // 获取可用模型
-    fetchModels()
+    // 延迟获取可用模型，确保 IPC 已就绪
+    setTimeout(() => {
+      fetchModels()
+    }, 500)
   })
 
   onUnmounted(() => {
