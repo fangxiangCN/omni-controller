@@ -250,7 +250,15 @@ function setupReportIpc() {
   })
 }
 
+let isAgentIpcSetup = false
+
 function setupAgentIpc() {
+  if (isAgentIpcSetup) {
+    console.log('[IPC] Agent IPC already set up, skipping...')
+    return
+  }
+  isAgentIpcSetup = true
+  
   console.log('[IPC] Setting up Agent IPC handlers...')
   
   const agentManager = getAgentManager()
