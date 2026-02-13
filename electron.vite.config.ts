@@ -32,6 +32,14 @@ export default defineConfig({
     plugins: [
       vue()
     ],
+    server: {
+      fs: {
+        allow: [
+          resolve(__dirname, 'src/renderer'),
+          resolve(__dirname, 'node_modules')
+        ]
+      }
+    },
     css: {
       preprocessorOptions: {
         less: {

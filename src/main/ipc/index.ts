@@ -44,6 +44,7 @@ import {
 } from './contract'
 
 let mainWindow: BrowserWindow | null = null
+let isIpcInitialized = false
 
 function sendToRenderer(channel: string, payload: unknown) {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -52,7 +53,15 @@ function sendToRenderer(channel: string, payload: unknown) {
 }
 
 export function initializeIpc(window: BrowserWindow) {
+  // Prevent duplicate initialization
+  if (isIpcInitialized) {
+    console.log('[IPC] Already initialized, skipping...')
+    return
+  }
+  
   mainWindow = window
+  isIpcInitialized = true
+  console.log('[IPC] Initializing IPC handlers...')
   
   // Setup managers
   deviceManager.setMainWindow(window)
