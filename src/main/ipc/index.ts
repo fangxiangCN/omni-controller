@@ -79,6 +79,7 @@ export function initializeIpc(window: BrowserWindow) {
   setupDeviceIpc()
   setupTaskIpc()
   setupReportIpc()
+  setupAgentIpc() // Ensure agent IPC is set up
   
   // Initialize playground
   playgroundServer.initialize()
@@ -236,15 +237,36 @@ function setupReportIpc() {
   // Delete report
   ipcMain.on(IPC_REPORT_DELETE, async (_event, reportId: string) => {
     console.log('Deleting report:', reportId)
-    // TODO: Implement actual deletion
+    // TODO: implement actual deletion
   })
-
-  // Setup Agent IPC
-  setupAgentIpc()
 }
 
 function setupAgentIpc() {
+  console.log('[IPC] Setting up Agent IPC handlers...')
+  
   const agentManager = getAgentManager()
+  
+  // Get available models
+  ipcMain.handle(IPC_AGENT_GET_MODELS, async () => {
+    console.log('[IPC] Getting available models...')
+    try {
+      const models = agentManager.getAvailableModels()
+      console.log(`[IPC] Found ${models.length} models`)
+      return models.map(m => ({
+        type: m.type,
+        name: m.name,
+        provider: m.provider,
+        baseUrl: m.baseUrl,
+        apiKey: m.apiKey,
+        model: m.model,
+        description: m.description,
+        capabilities: m.capabilities,
+      } as ModelConfigPayload))
+    } catch (error) {
+      console.error('[IPC] Error getting models:', error)
+      return []
+    }
+  })
 
   // Initialize agent
   ipcMain.handle(IPC_AGENT_INITIALIZE, async (_event, config?: AIModelConfig) => {
