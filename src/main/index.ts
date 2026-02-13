@@ -115,10 +115,13 @@ function createWindow(): void {
     console.error('[Window] Failed to load:', errorCode, errorDescription)
   })
 
-  // Initialize IPC handlers after window is loaded
+  // Initialize IPC handlers BEFORE window loads to ensure they're ready when renderer starts
+  console.log('[Window] Initializing IPC...')
+  initializeIpc(mainWindow!)
+  
+  // Track when renderer is ready
   mainWindow.webContents.on('did-finish-load', () => {
     console.log('[Window] Renderer loaded successfully')
-    initializeIpc(mainWindow!)
   })
 }
 
