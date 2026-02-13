@@ -153,7 +153,7 @@ const selectedModel = computed(() =>
 
 // 转换日志为 Chat 消息格式
 const chatMessages = computed<ChatMessage[]>(() => {
-  return logs.value.map(log => ({
+  return (logs.value || []).map(log => ({
     role: log.type === 'user' ? 'user' : 'assistant',
     content: log.content,
     avatar: log.type === 'user' 

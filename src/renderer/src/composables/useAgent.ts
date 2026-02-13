@@ -107,15 +107,15 @@ export function useAgent() {
   })
 
   return {
-    // State
+    // State - 直接返回 store 的 ref，保持响应式
     isReady: agentStore.isReady,
     isRunning: agentStore.isRunning,
-    logs: agentStore.logs,
+    logs: agentStore.logs || ref([]),
     currentThought: agentStore.currentThought,
     currentActions: agentStore.currentActions,
     lastResult: agentStore.lastResult,
     error: agentStore.error,
-    models: agentStore.models,
+    models: agentStore.models || ref([]),
     currentModel: agentStore.currentModel,
     // Getters
     hasError: agentStore.hasError,
