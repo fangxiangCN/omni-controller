@@ -80,7 +80,7 @@
       shape="circle"
       @click="showSettings = true"
     >
-      <t-icon name="setting" /
+      <t-icon name="setting" />
     </t-button>
 
     <!-- 设置对话框 -->

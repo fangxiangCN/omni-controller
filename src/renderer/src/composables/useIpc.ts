@@ -1,5 +1,3 @@
-import { onMounted, onUnmounted } from 'vue'
-
 export function useIpc() {
   const ipcRenderer = (window as any).api?.ipcRenderer
 

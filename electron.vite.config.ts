@@ -1,9 +1,6 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { TDesignResolver } from 'tdesign-vue-next/es/resolvers'
 
 export default defineConfig({
   main: {
@@ -33,27 +30,7 @@ export default defineConfig({
       }
     },
     plugins: [
-      vue(),
-      AutoImport({
-        resolvers: [
-          TDesignResolver({
-            library: 'vue-next'
-          })
-        ],
-        imports: ['vue', 'pinia'],
-        dts: true
-      }),
-      Components({
-        resolvers: [
-          TDesignResolver({
-            library: 'vue-next'
-          }),
-          TDesignResolver({
-            library: 'chat'
-          })
-        ],
-        dts: true
-      })
+      vue()
     ],
     css: {
       preprocessorOptions: {

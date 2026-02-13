@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "outDir": "./out/renderer",
     "rootDir": "./src/renderer",
     "baseUrl": ".",
@@ -20,6 +20,6 @@
       "@preload/*": ["./src/preload/*"]
     }
   },
-  "include": ["src/renderer/**/*"],
+  "include": ["src/renderer/**/*", "src/**/*.vue"],
   "exclude": ["node_modules", "dist", "out"]
 }

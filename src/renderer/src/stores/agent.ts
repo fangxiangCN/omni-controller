@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { AgentLogPayload, ModelConfigPayload, ModelType } from '../types'
+import type { AgentLogPayload, ModelConfigPayload } from '../types'
 
 export const useAgentStore = defineStore('agent', () => {
   // State
