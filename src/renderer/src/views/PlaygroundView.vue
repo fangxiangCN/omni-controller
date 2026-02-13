@@ -91,7 +91,7 @@
       :confirm-btn="{ content: '保存', theme: 'primary' }"
       @confirm="handleSaveSettings"
     >
-      <t-form :data="modelConfig" label-width="100px">
+      <t-form label-width="100px">
         <t-form-item label="AI 模型">
           <t-select v-model="modelConfig.type" placeholder="选择模型">
             <t-option 
@@ -145,10 +145,10 @@ const modelConfig = ref<{
   apiKey: ''
 })
 
-const availableModels = computed(() => models.value)
+const availableModels = computed(() => models.value || [])
 
 const selectedModel = computed(() =>
-  models.value.find(m => m.type === modelConfig.value.type)
+  (models.value || []).find(m => m.type === modelConfig.value.type)
 )
 
 // 转换日志为 Chat 消息格式
