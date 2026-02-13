@@ -1,4 +1,4 @@
-/* Omni Controller - Global Styles */
+/* Omni Controller - Global Styles (Light Theme) */
 
 /* CSS Variables for theming */
 :root {
@@ -7,19 +7,19 @@
   --color-primary-hover: #2563EB;
   --color-primary-active: #1D4ED8;
   
-  /* Background Colors */
-  --color-background: #0F172A;
-  --color-background-secondary: #1E293B;
-  --color-background-tertiary: #334155;
+  /* Background Colors - Light */
+  --color-background: #FFFFFF;
+  --color-background-secondary: #F8FAFC;
+  --color-background-tertiary: #F1F5F9;
   
-  /* Text Colors */
-  --color-text-primary: #F1F5F9;
-  --color-text-secondary: #94A3B8;
-  --color-text-tertiary: #64748B;
+  /* Text Colors - Dark for light background */
+  --color-text-primary: #1E293B;
+  --color-text-secondary: #64748B;
+  --color-text-tertiary: #94A3B8;
   
   /* Border Colors */
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-border-hover: rgba(255, 255, 255, 0.2);
+  --color-border: rgba(0, 0, 0, 0.1);
+  --color-border-hover: rgba(0, 0, 0, 0.2);
   
   /* Status Colors */
   --color-success: #10B981;
@@ -55,7 +55,7 @@ body {
   color: var(--color-text-primary);
 }
 
-/* Scrollbar Styles */
+/* Scrollbar Styles - Darker for light theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -66,12 +66,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 /* Selection Styles */

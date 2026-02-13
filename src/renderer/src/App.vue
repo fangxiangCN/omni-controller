@@ -26,26 +26,26 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* TDesign 暗色主题变量 */
+/* TDesign 亮色主题变量 */
 :root {
   --td-brand-color: #3B82F6;
   --td-brand-color-hover: #2563EB;
   --td-brand-color-active: #1D4ED8;
   --td-brand-color-focus: #3B82F6;
   
-  --td-bg-color-page: #0F172A;
-  --td-bg-color-container: #1E293B;
-  --td-bg-color-container-hover: #334155;
-  --td-bg-color-container-active: #475569;
-  --td-bg-color-secondarycontainer: #1A202C;
+  --td-bg-color-page: #FFFFFF;
+  --td-bg-color-container: #FFFFFF;
+  --td-bg-color-container-hover: #F8FAFC;
+  --td-bg-color-container-active: #F1F5F9;
+  --td-bg-color-secondarycontainer: #F8FAFC;
   
-  --td-text-color-primary: #F1F5F9;
-  --td-text-color-secondary: #94A3B8;
-  --td-text-color-placeholder: #64748B;
-  --td-text-color-disabled: #475569;
+  --td-text-color-primary: #1E293B;
+  --td-text-color-secondary: #64748B;
+  --td-text-color-placeholder: #94A3B8;
+  --td-text-color-disabled: #CBD5E1;
   
-  --td-border-color: rgba(255, 255, 255, 0.1);
-  --td-border-color-hover: rgba(255, 255, 255, 0.2);
+  --td-border-color: rgba(0, 0, 0, 0.1);
+  --td-border-color-hover: rgba(0, 0, 0, 0.2);
   
   --td-success-color: #10B981;
   --td-warning-color: #F59E0B;
