@@ -1,65 +1,14 @@
 <template>
   <div class="title-bar">
-    <div class="title-bar-content">
-      <div class="window-controls">
-        <t-button 
-          variant="text" 
-          shape="square"
-          size="small"
-          @click="minimizeWindow"
-        >
-          <t-icon name="minus" />
-        </t-button>
-        <t-button 
-          variant="text" 
-          shape="square"
-          size="small"
-          @click="toggleMaximize"
-        >
-          <t-icon :name="isMaximized ? 'fullscreen-exit' : 'fullscreen'" />
-        </t-button>
-        <t-button 
-          variant="text" 
-          shape="square"
-          size="small"
-          theme="danger"
-          @click="closeWindow"
-        >
-          <t-icon name="close" />
-        </t-button>
-      </div>
-      
-      <div class="app-title">
-        <t-icon name="logo" class="app-icon" />
-        <span>Omni Controller</span>
-      </div>
+    <div class="app-title">
+      <t-icon name="logo" class="app-icon" />
+      <span>Omni Controller</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-
-const isMaximized = ref(false)
-
-function minimizeWindow() {
-  window.api?.minimizeWindow?.()
-}
-
-function toggleMaximize() {
-  window.api?.toggleMaximizeWindow?.()
-}
-
-function closeWindow() {
-  window.api?.closeWindow?.()
-}
-
-onMounted(() => {
-  // 监听窗口状态变化
-  window.api?.onWindowStateChange?.((state: { maximized: boolean }) => {
-    isMaximized.value = state.maximized
-  })
-})
+// 使用 Electron 原生窗口按钮，不需要自定义控制
 </script>
 
 <style scoped>
@@ -67,23 +16,9 @@ onMounted(() => {
   height: 40px;
   background-color: var(--td-bg-color-container);
   border-bottom: 1px solid var(--td-border-color);
-  -webkit-app-region: drag;
   display: flex;
   align-items: center;
-  padding: 0 12px;
-}
-
-.title-bar-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.window-controls {
-  display: flex;
-  gap: 8px;
-  -webkit-app-region: no-drag;
+  padding: 0 16px;
 }
 
 .app-title {
